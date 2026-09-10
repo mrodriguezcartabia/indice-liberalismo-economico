@@ -1,0 +1,938 @@
+{
+  "meta": {
+    "sigla": "HF",
+    "carpeta": "heritage",
+    "nombre": {
+      "es": "Índice de Libertad Económica (réplica)",
+      "en": "Index of Economic Freedom (replica)"
+    },
+    "descripcion": {
+      "es": "Réplica exacta del índice publicado por The Heritage Foundation desde 1995. Doce componentes promediados con peso igual. Es la vara más citada en prensa, y el punto de partida de esta página.\n",
+      "en": "Exact replica of the index published by The Heritage Foundation since 1995. Twelve components averaged with equal weight. It is the most widely cited benchmark in the press, and the starting point of this page.\n"
+    },
+    "escala": {
+      "es": "0 a 100. Más alto = más libertad económica según su definición.",
+      "en": "0 to 100. Higher = more economic freedom under their definition."
+    },
+    "fecha_corte": "2025-06-30",
+    "vintage": 2026,
+    "cobertura_minima": 0.9,
+    "fuente": {
+      "publicador": "The Heritage Foundation",
+      "dataset": "Index of Economic Freedom 2026 (32ª edición)",
+      "url_datos": "https://static.heritage.org/index/data/2026/2026_indexofeconomicfreedom_data.xlsx",
+      "url_metodologia": "https://static.heritage.org/index/pdf/2026/2026_indexofeconomicfreedom_methodology.pdf",
+      "url_pagina": "https://economicfreedom.heritage.org/pages/all-country-scores",
+      "archivo": "2026_indexofeconomicfreedom_data.xlsx",
+      "hoja": "ef2026",
+      "saltar": 1,
+      "cobertura": "184 países listados, 176 calificados",
+      "nota": {
+        "es": "El archivo trae país, región, puntaje total y los 12 componentes. No incluye insumos crudos: las ediciones anteriores a 2022 traían tasas impositivas, gasto y aranceles, ésta no. Dos nombres de columna tienen erratas del original (\"Judicial Efectiveness\", \"Monitary Freedom\") y se copian literalmente.\n",
+        "en": "The file contains country, region, overall score and the 12 components. It carries no raw inputs: editions before 2022 included tax rates, spending and tariffs, this one does not. Two column names contain typos from the original and are copied verbatim.\n"
+      }
+    },
+    "validacion": {
+      "es": "El promedio simple de los 12 componentes se compara contra el puntaje total publicado. Diferencia máxima verificada: 0,067 puntos en 176 países, atribuible a redondeo.\n",
+      "en": "The simple average of the 12 components is compared against the published overall score. Maximum verified difference: 0.067 points across 176 countries, attributable to rounding.\n"
+    },
+    "no_calificados": {
+      "paises": [
+        "AFG",
+        "IRQ",
+        "LBY",
+        "LIE",
+        "SOM",
+        "SYR",
+        "UKR",
+        "YEM"
+      ],
+      "nota": {
+        "es": "Ocho países quedan sin puntaje total. Heritage no publica en su metodología el criterio por el cual se los excluye.\n",
+        "en": "Eight countries have no overall score. Heritage does not publish in its methodology the criterion by which they are excluded.\n"
+      }
+    }
+  },
+  "validacion": {
+    "disponible": true,
+    "serie_referencia": "hf_overall",
+    "paises_comparados": 176,
+    "diferencia_media": 0.0249,
+    "diferencia_maxima": 0.0667,
+    "cierra": true
+  },
+  "rezagos": {
+    "z_propiedad_estatal": {
+      "anio_dato": 2023,
+      "anio_asignado": 2026,
+      "paises": 162
+    },
+    "z_inversion_publica": {
+      "anio_dato": 2023,
+      "anio_asignado": 2026,
+      "paises": 161
+    },
+    "z_controles_capital": {
+      "anio_dato": 2023,
+      "anio_asignado": 2026,
+      "paises": 165
+    },
+    "z_regulacion_credito": {
+      "anio_dato": 2023,
+      "anio_asignado": 2026,
+      "paises": 164
+    },
+    "z_consumo_publico": {
+      "anio_dato": 2023,
+      "anio_asignado": 2026,
+      "paises": 165
+    },
+    "z_entrada_mercados": {
+      "anio_dato": 2023,
+      "anio_asignado": 2026,
+      "paises": 165
+    }
+  },
+  "presets": {
+    "heritage": {
+      "nombre": {
+        "es": "Heritage",
+        "en": "Heritage"
+      },
+      "descripcion": {
+        "es": "La ponderación oficial: los doce componentes con diez puntos cada uno. Como cada categoría agrupa tres componentes, las cuatro terminan pesando 25%. Ese 25% no es una decisión declarada: es consecuencia de cuántos componentes tiene cada una.\n",
+        "en": "The official weighting: the twelve components with ten points each. Since each category groups three components, all four end up weighing 25%. That 25% is not a declared decision: it follows from how many components each one has.\n"
+      },
+      "puntos": {
+        "hf_property_rights": 10,
+        "hf_judicial_effectiveness": 10,
+        "hf_government_integrity": 10,
+        "hf_tax_burden": 10,
+        "hf_government_spending": 10,
+        "hf_fiscal_health": 10,
+        "hf_business_freedom": 10,
+        "hf_labor_freedom": 10,
+        "hf_monetary_freedom": 10,
+        "hf_trade_freedom": 10,
+        "hf_investment_freedom": 10,
+        "hf_financial_freedom": 10,
+        "z_propiedad_estatal": 0,
+        "z_inversion_publica": 0,
+        "z_controles_capital": 0,
+        "z_regulacion_credito": 0,
+        "z_consumo_publico": 0,
+        "z_entrada_mercados": 0
+      }
+    },
+    "verdadero": {
+      "nombre": {
+        "es": "Verdadero índice de libertad económica",
+        "en": "True index of economic freedom"
+      },
+      "descripcion": {
+        "es": "Dieciséis componentes. Deja fuera los cinco que no miden reglas: integridad del gobierno y las libertades de inversión y financiera por ser evaluaciones cualitativas; libertad de empresa porque mide desarrollo; y libertad laboral porque su fórmula compara contra el promedio mundial y produce resultados que no se sostienen. Suma los nueve componentes de Fraser que miden la presencia del Estado, ausentes del índice de Heritage. Ningún par de componentes mide lo mismo: los tres de Fraser que se superponían con componentes de Heritage quedaron fuera, así que los trece pesan igual sin que ninguna dimensión se cuente dos veces.\n",
+        "en": "Sixteen components. It leaves out the five that do not measure rules: government integrity and investment and financial freedom, being qualitative assessments; business freedom, which measures development; and labor freedom, whose formula compares against the world average. It adds the nine Fraser components measuring state presence, absent from the Heritage index. No pair of components measures the same thing: the three Fraser components overlapping with Heritage ones were removed, so all thirteen weigh equally without any dimension being counted twice.\n"
+      },
+      "puntos": {
+        "hf_property_rights": 10,
+        "hf_judicial_effectiveness": 10,
+        "hf_government_integrity": 0,
+        "hf_tax_burden": 10,
+        "hf_government_spending": 10,
+        "hf_fiscal_health": 10,
+        "hf_business_freedom": 0,
+        "hf_labor_freedom": 0,
+        "hf_monetary_freedom": 10,
+        "hf_trade_freedom": 10,
+        "hf_investment_freedom": 0,
+        "hf_financial_freedom": 0,
+        "z_propiedad_estatal": 10,
+        "z_inversion_publica": 10,
+        "z_controles_capital": 10,
+        "z_regulacion_credito": 10,
+        "z_consumo_publico": 10,
+        "z_entrada_mercados": 10
+      }
+    }
+  },
+  "puntos_totales": 120,
+  "pilares": {
+    "estado_de_derecho": {
+      "titulo": {
+        "es": "Estado de derecho",
+        "en": "Rule of Law"
+      },
+      "descripcion": null
+    },
+    "tamano_estado": {
+      "titulo": {
+        "es": "Tamaño del Estado",
+        "en": "Government Size"
+      },
+      "descripcion": null
+    },
+    "eficiencia_regulatoria": {
+      "titulo": {
+        "es": "Eficiencia regulatoria",
+        "en": "Regulatory Efficiency"
+      },
+      "descripcion": null
+    },
+    "mercados_abiertos": {
+      "titulo": {
+        "es": "Mercados abiertos",
+        "en": "Open Markets"
+      },
+      "descripcion": null
+    },
+    "restricciones_externas": {
+      "titulo": {
+        "es": "Restricciones adicionales",
+        "en": "Additional restrictions"
+      },
+      "descripcion": {
+        "es": "Restricciones legales que Heritage sólo considera de manera cualitativa, dentro de Libertad de inversión y Libertad financiera. Este pilar arranca en cero.\n",
+        "en": "Legal restrictions that Heritage only considers qualitatively, within Investment Freedom and Financial Freedom. This pillar starts at zero.\n"
+      }
+    },
+    "propiedad_estatal": {
+      "titulo": {
+        "es": "Propiedad estatal",
+        "en": "State ownership"
+      },
+      "descripcion": {
+        "es": "Heritage no incluye ningún componente que mida qué posee el Estado dentro de la economía. Este pilar arranca en cero: subirlo agrega una dimensión que el índice original no tiene.\n",
+        "en": "Heritage includes no component measuring what the state owns within the economy. This pillar starts at zero: raising it adds a dimension the original index does not have.\n"
+      }
+    }
+  },
+  "componentes": {
+    "hf_property_rights": {
+      "pilar": "estado_de_derecho",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Derechos de propiedad",
+        "en": "Property Rights"
+      },
+      "definicion": {
+        "es": "Mide si el marco legal permite adquirir, mantener y usar propiedad privada, y si esas leyes se hacen cumplir. Mide la SEGURIDAD de los derechos, no la DISTRIBUCIÓN de la propiedad.\n",
+        "en": "Measures whether the legal framework allows acquiring, holding and using private property, and whether those laws are enforced. It measures the SECURITY of rights, not the DISTRIBUTION of ownership.\n"
+      },
+      "subfactores": {
+        "n": 3,
+        "verificado": false,
+        "detalle": "Credendo · US Chamber IP Index · World Bank WGI"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "propiedad segura y bien protegida",
+        "en": "secure, well-protected property"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Property Rights",
+        "insumos": "Credendo Country Risk · US Chamber International IP Index · World Bank Worldwide Governance Indicators"
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_judicial_effectiveness": {
+      "pilar": "estado_de_derecho",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Efectividad judicial",
+        "en": "Judicial Effectiveness"
+      },
+      "definicion": {
+        "es": "Independencia judicial y calidad del proceso legal.",
+        "en": "Judicial independence and quality of the legal process."
+      },
+      "subfactores": {
+        "n": 2,
+        "verificado": false,
+        "detalle": "Freedom House · World Bank WGI"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "justicia independiente y eficaz",
+        "en": "independent, effective courts"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Judicial Efectiveness",
+        "insumos": "Freedom House Freedom in the World · World Bank WGI",
+        "nota_columna": {
+          "es": "errata en el original",
+          "en": "typo in the original"
+        }
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_government_integrity": {
+      "pilar": "estado_de_derecho",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Integridad del gobierno",
+        "en": "Government Integrity"
+      },
+      "definicion": {
+        "es": "Percepción de corrupción y soborno. Basado en encuestas de expertos.",
+        "en": "Perception of corruption and bribery. Based on expert surveys."
+      },
+      "subfactores": {
+        "n": 3,
+        "verificado": false,
+        "detalle": "Transparency International · TRACE · World Bank WGI"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "corrupción nula",
+        "en": "no corruption"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Government Integrity",
+        "insumos": "Transparency International CPI · TRACE Bribery Risk Matrix · World Bank WGI"
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_tax_burden": {
+      "pilar": "tamano_estado",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Carga tributaria",
+        "en": "Tax Burden"
+      },
+      "definicion": {
+        "es": "Promedio de tres subfactores: alícuota máxima del impuesto a las ganancias personales, alícuota máxima corporativa, y recaudación total sobre PBI. No incluye aportes obligatorios a la seguridad social.\n",
+        "en": "Average of three sub-factors: top marginal personal income tax rate, top corporate rate, and total tax revenue over GDP. Mandatory social security contributions are not included.\n"
+      },
+      "subfactores": {
+        "n": 3,
+        "verificado": true,
+        "detalle": "Alícuota máxima personal · alícuota máxima corporativa · recaudación sobre PBI"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "impuestos cero",
+        "en": "zero taxes"
+      },
+      "externo": false,
+      "formula": "100 − 0,03 · x²  (promedio de los tres subfactores)",
+      "fuente": {
+        "columna": "Tax Burden",
+        "insumos": "KPMG · Deloitte · PwC Worldwide Tax Summaries · World Bank WDI · OCDE · Eurostat · FMI"
+      },
+      "reproducible": "total",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_government_spending": {
+      "pilar": "tamano_estado",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Gasto público",
+        "en": "Government Spending"
+      },
+      "definicion": {
+        "es": "Gasto público total sobre PBI, promedio de tres años. Mide flujo presupuestario, no patrimonio: los activos que posee el Estado no entran.\n",
+        "en": "Total government spending over GDP, three-year average. It measures budget flow, not assets: state-owned assets do not enter.\n"
+      },
+      "subfactores": {
+        "n": 1,
+        "verificado": true,
+        "detalle": "Gasto público sobre PBI, promedio de tres años"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "gasto público cero",
+        "en": "zero government spending"
+      },
+      "externo": false,
+      "formula": "100 − 0,03 · G²  (G = gasto/PBI, promedio 3 años)",
+      "fuente": {
+        "columna": "Government Spending",
+        "insumos": "FMI World Economic Outlook · OCDE · Eurostat · BAfD · BAD · CEPAL"
+      },
+      "reproducible": "total",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_fiscal_health": {
+      "pilar": "tamano_estado",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Salud fiscal",
+        "en": "Fiscal Health"
+      },
+      "definicion": {
+        "es": "Déficit y deuda pública. Es un resultado fiscal, no una libertad.",
+        "en": "Deficit and public debt. It is a fiscal outcome, not a freedom."
+      },
+      "subfactores": {
+        "n": 2,
+        "verificado": true,
+        "pesos": [
+          0.8,
+          0.2
+        ],
+        "detalle": "Déficit fiscal (80%) · deuda pública (20%)",
+        "nota": {
+          "es": "Es el único componente con ponderación interna desigual declarada, dentro de un índice que promedia sus componentes con peso igual.\n",
+          "en": "It is the only component with a declared unequal internal weighting, inside an index that averages its components with equal weight.\n"
+        }
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "sin déficit ni deuda",
+        "en": "no deficit, no debt"
+      },
+      "externo": false,
+      "formula": "0,8 · (100 − 2·D²) + 0,2 · (100 − 0,01·B²)",
+      "fuente": {
+        "columna": "Fiscal Health",
+        "insumos": "FMI World Economic Outlook"
+      },
+      "reproducible": "total",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_business_freedom": {
+      "pilar": "eficiencia_regulatoria",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Libertad de empresa",
+        "en": "Business Freedom"
+      },
+      "definicion": {
+        "es": "Cuatro subfactores con peso igual: acceso a electricidad, riesgo del entorno de negocios, calidad regulatoria e inclusión económica de la mujer. El acceso a electricidad es un indicador de infraestructura.\n",
+        "en": "Four equally weighted sub-factors: access to electricity, business environment risk, regulatory quality and women's economic inclusion. Access to electricity is an infrastructure indicator.\n"
+      },
+      "subfactores": {
+        "n": 4,
+        "verificado": true,
+        "detalle": "Acceso a electricidad · riesgo del entorno de negocios · calidad regulatoria · inclusión económica de la mujer"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "operar una empresa es fácil y barato",
+        "en": "running a business is easy and cheap"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Business Freedom",
+        "insumos": "World Bank WGI y WDI · Credendo · World Bank Women, Business and the Law"
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_labor_freedom": {
+      "pilar": "eficiencia_regulatoria",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Libertad laboral",
+        "en": "Labor Freedom"
+      },
+      "definicion": {
+        "es": "Nueve subfactores con peso igual, entre ellos la productividad laboral y la tasa de participación, que son resultados y no reglas.\n",
+        "en": "Nine equally weighted sub-factors, including labor productivity and the participation rate, which are outcomes rather than rules.\n"
+      },
+      "subfactores": {
+        "n": 9,
+        "verificado": true,
+        "detalle": "Nueve subfactores, incluidos productividad laboral y tasa de participación"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "mercado laboral sin regulación",
+        "en": "unregulated labor market"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Labor Freedom",
+        "insumos": "World Bank WGI y WDI · Freedom House · OIT · World Bank Employing Workers"
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_monetary_freedom": {
+      "pilar": "eficiencia_regulatoria",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Libertad monetaria",
+        "en": "Monetary Freedom"
+      },
+      "definicion": {
+        "es": "Inflación ponderada de tres años, menos una penalización por controles de precios de hasta 20 puntos que Heritage no publica por país.\n",
+        "en": "Three-year weighted inflation, minus a price-control penalty of up to 20 points which Heritage does not publish by country.\n"
+      },
+      "subfactores": {
+        "n": 2,
+        "verificado": true,
+        "detalle": "Inflación ponderada de tres años · penalización por controles de precios"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "inflación cero y sin controles de precios",
+        "en": "zero inflation, no price controls"
+      },
+      "externo": false,
+      "formula": "100 − 6,333·√(inflación ponderada) − penalización  ·  pesos 0,665 / 0,245 / 0,090",
+      "fuente": {
+        "columna": "Monitary Freedom",
+        "insumos": "FMI International Financial Statistics · FMI World Economic Outlook",
+        "nota_columna": {
+          "es": "errata en el original",
+          "en": "typo in the original"
+        }
+      },
+      "reproducible": "parcial",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_trade_freedom": {
+      "pilar": "mercados_abiertos",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Libertad comercial",
+        "en": "Trade Freedom"
+      },
+      "definicion": {
+        "es": "Arancel promedio ponderado, menos una penalización por barreras no arancelarias que Heritage no publica por país. Entre esas barreras considera el número de medidas notificadas a la OMC.\n",
+        "en": "Weighted average tariff, minus a non-tariff barrier penalty which Heritage does not publish by country. Among those barriers it considers the number of measures notified to the WTO.\n"
+      },
+      "subfactores": {
+        "n": 2,
+        "verificado": true,
+        "detalle": "Arancel promedio ponderado · penalización por barreras no arancelarias"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "aranceles cero y sin barreras",
+        "en": "zero tariffs, no barriers"
+      },
+      "externo": false,
+      "formula": "100 · (50 − arancel) / 50 − penalización",
+      "fuente": {
+        "columna": "Trade Freedom",
+        "insumos": "OMC World Tariff Profiles · World Bank WDI · USTR National Trade Estimate"
+      },
+      "reproducible": "parcial",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_investment_freedom": {
+      "pilar": "mercados_abiertos",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Libertad de inversión",
+        "en": "Investment Freedom"
+      },
+      "definicion": {
+        "es": "Arranca en 100 y se descuentan 5, 10, 15, 20 o 25 puntos según evaluación cualitativa. Entre los descuentos hay restricciones a la compra de inmuebles, todas referidas a compradores extranjeros: que el Estado sea propietario del suelo no descuenta puntos.\n",
+        "en": "Starts at 100 and 5, 10, 15, 20 or 25 points are deducted based on qualitative assessment. Deductions include restrictions on real estate purchases, all referring to foreign buyers: state ownership of land deducts no points.\n"
+      },
+      "subfactores": {
+        "n": 1,
+        "verificado": true,
+        "detalle": "Puntaje único asignado por evaluación cualitativa"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "sin restricciones al movimiento de capitales",
+        "en": "no restrictions on capital movement"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Investment Freedom",
+        "insumos": "US State Dept Investment Climate Statements · USTR · OCDE · FMI Artículo IV"
+      },
+      "reproducible": "ninguna",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "hf_financial_freedom": {
+      "pilar": "mercados_abiertos",
+      "puntos": 10,
+      "peso_total": 0.083333,
+      "titulo": {
+        "es": "Libertad financiera",
+        "en": "Financial Freedom"
+      },
+      "definicion": {
+        "es": "Puntajes asignados en escalones de 10 según criterio. Cada escalón se define en parte por la participación del Estado en los activos del sector financiero: es el único lugar del índice donde la propiedad estatal se considera, y de manera cualitativa.\n",
+        "en": "Scores assigned in steps of 10 by judgment. Each step is defined partly by the state's share of financial sector assets: it is the only place in the index where state ownership is considered, and qualitatively.\n"
+      },
+      "subfactores": {
+        "n": 1,
+        "verificado": true,
+        "detalle": "Puntaje único asignado en escalones de diez"
+      },
+      "superpone_con": null,
+      "significa_100": {
+        "es": "participación estatal mínima en el sector financiero",
+        "en": "minimal state share of the financial sector"
+      },
+      "externo": false,
+      "formula": null,
+      "fuente": {
+        "columna": "Financial Freedom",
+        "insumos": "FMI Artículo IV · OCDE Economic Surveys · bancos centrales"
+      },
+      "reproducible": "ninguna",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 100
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "z_propiedad_estatal": {
+      "pilar": "propiedad_estatal",
+      "puntos": 0,
+      "peso_total": 0.0,
+      "titulo": {
+        "es": "Propiedad estatal de la economía",
+        "en": "State ownership of the economy"
+      },
+      "definicion": {
+        "es": "Extensión de la propiedad del Estado sobre la economía. No forma parte del índice de Heritage: ninguno de sus doce componentes mide esta dimensión. La única consideración aparece dentro de Libertad financiera, de manera cualitativa.\n",
+        "en": "Extent of state ownership over the economy. It is not part of the Heritage index: none of its twelve components measures this dimension. The only consideration appears within Financial Freedom, qualitatively.\n"
+      },
+      "subfactores": null,
+      "superpone_con": null,
+      "significa_100": {
+        "es": "el Estado no posee nada de la economía",
+        "en": "the state owns nothing in the economy"
+      },
+      "externo": true,
+      "formula": null,
+      "fuente": {
+        "columna": "IE State ownership",
+        "publicador": "Fraser Institute",
+        "dataset": "Economic Freedom of the World 2025",
+        "url": "https://www.fraserinstitute.org/economic-freedom/dataset",
+        "insumos": "V-Dem, variable v2clstown",
+        "escala_original": "0–10, 10 = menos Estado",
+        "cobertura": "165 países, hasta 2023",
+        "advertencia": {
+          "es": "Dato del Fraser Institute, organización de orientación libertaria. Se usa precisamente por eso: la dimensión que falta en Heritage la publica una institución del mismo campo.\n",
+          "en": "Data from the Fraser Institute, a libertarian-leaning organization. It is used precisely for that reason: the dimension missing from Heritage is published by an institution from the same camp.\n"
+        }
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 10
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "z_inversion_publica": {
+      "pilar": "propiedad_estatal",
+      "puntos": 0,
+      "peso_total": 0.0,
+      "titulo": {
+        "es": "Inversión pública",
+        "en": "Government investment"
+      },
+      "definicion": {
+        "es": "Inversión del gobierno como proporción de la inversión total. Mide cuánto del capital que se forma en la economía lo decide el Estado.\n",
+        "en": "Government investment as a share of total investment. It measures how much of the capital formed in the economy is decided by the state.\n"
+      },
+      "subfactores": null,
+      "superpone_con": null,
+      "significa_100": {
+        "es": "toda la inversión es privada",
+        "en": "all investment is private"
+      },
+      "externo": true,
+      "formula": null,
+      "fuente": {
+        "columna": "1C  Government investment",
+        "publicador": "Fraser Institute",
+        "dataset": "Economic Freedom of the World 2025",
+        "url": "https://www.fraserinstitute.org/economic-freedom/dataset",
+        "escala_original": "0–10, 10 = menos Estado",
+        "cobertura": "161 países, hasta 2023",
+        "advertencia": {
+          "es": "Dato del Fraser Institute, organización de orientación libertaria. El índice de Heritage no incluye ningún componente que mida esto.\n",
+          "en": "Data from the Fraser Institute, a libertarian-leaning organization. The Heritage index includes no component measuring this.\n"
+        }
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 10
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "z_controles_capital": {
+      "pilar": "restricciones_externas",
+      "puntos": 0,
+      "peso_total": 0.0,
+      "titulo": {
+        "es": "Controles de capital",
+        "en": "Capital controls"
+      },
+      "definicion": {
+        "es": "Restricciones legales al movimiento de capitales, según la cantidad de categorías con controles en el informe AREAER del FMI. Heritage lo considera dentro de Libertad de inversión, con descuentos cualitativos de 5, 10 o 15 puntos.\n",
+        "en": "Legal restrictions on capital movement, based on the number of categories with controls in the IMF AREAER report. Heritage considers it within Investment Freedom, with qualitative deductions of 5, 10 or 15 points.\n"
+      },
+      "subfactores": null,
+      "superpone_con": null,
+      "significa_100": {
+        "es": "sin controles de capital",
+        "en": "no capital controls"
+      },
+      "externo": true,
+      "formula": null,
+      "fuente": {
+        "columna": "4Dii  Capital controls",
+        "publicador": "Fraser Institute",
+        "dataset": "Economic Freedom of the World 2025",
+        "url": "https://www.fraserinstitute.org/economic-freedom/dataset",
+        "escala_original": "0–10, 10 = menos Estado",
+        "cobertura": "165 países, hasta 2023",
+        "advertencia": {
+          "es": "Dato del Fraser Institute, organización de orientación libertaria. El índice de Heritage no incluye ningún componente que mida esto.\n",
+          "en": "Data from the Fraser Institute, a libertarian-leaning organization. The Heritage index includes no component measuring this.\n"
+        }
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 10
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "z_regulacion_credito": {
+      "pilar": "restricciones_externas",
+      "puntos": 0,
+      "peso_total": 0.0,
+      "titulo": {
+        "es": "Regulación del crédito",
+        "en": "Credit market regulation"
+      },
+      "definicion": {
+        "es": "Propiedad estatal de los bancos, crédito absorbido por el sector público y controles de tasas de interés. Heritage lo trata dentro de Libertad financiera, con puntajes asignados en escalones de diez.\n",
+        "en": "State ownership of banks, credit absorbed by the public sector and interest rate controls. Heritage treats it within Financial Freedom, with scores assigned in steps of ten.\n"
+      },
+      "subfactores": null,
+      "superpone_con": null,
+      "significa_100": {
+        "es": "crédito privado, sin bancos estatales ni topes de tasa",
+        "en": "private credit, no state banks, no rate caps"
+      },
+      "externo": true,
+      "formula": null,
+      "fuente": {
+        "columna": "5A  Credit market regulation",
+        "publicador": "Fraser Institute",
+        "dataset": "Economic Freedom of the World 2025",
+        "url": "https://www.fraserinstitute.org/economic-freedom/dataset",
+        "escala_original": "0–10, 10 = menos Estado",
+        "cobertura": "164 países, hasta 2023",
+        "advertencia": {
+          "es": "Dato del Fraser Institute, organización de orientación libertaria. El índice de Heritage no incluye ningún componente que mida esto.\n",
+          "en": "Data from the Fraser Institute, a libertarian-leaning organization. The Heritage index includes no component measuring this.\n"
+        }
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 10
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "z_consumo_publico": {
+      "pilar": "tamano_estado",
+      "puntos": 0,
+      "peso_total": 0.0,
+      "titulo": {
+        "es": "Consumo público",
+        "en": "Government consumption"
+      },
+      "definicion": {
+        "es": "Consumo del gobierno como proporción del consumo total. Es distinto del gasto público de Heritage, que incluye inversión y transferencias: la correlación medida entre ambos es 0,649.\n",
+        "en": "Government consumption as a share of total consumption. It differs from Heritage's government spending, which includes investment and transfers: their measured correlation is 0.649.\n"
+      },
+      "subfactores": null,
+      "superpone_con": "hf_government_spending",
+      "significa_100": {
+        "es": "consumo del gobierno cero",
+        "en": "zero government consumption"
+      },
+      "externo": true,
+      "formula": null,
+      "fuente": {
+        "columna": "1A Government consumption",
+        "publicador": "Fraser Institute",
+        "dataset": "Economic Freedom of the World 2025",
+        "url": "https://www.fraserinstitute.org/economic-freedom/dataset",
+        "escala_original": "0–10, 10 = menos Estado",
+        "cobertura": "165 países, hasta 2023",
+        "advertencia": {
+          "es": "Dato del Fraser Institute, organización de orientación libertaria.\n",
+          "en": "Data from the Fraser Institute, a libertarian-leaning organization.\n"
+        }
+      },
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 10
+      },
+      "direccion": "mas_es_mas_libre"
+    },
+    "z_entrada_mercados": {
+      "pilar": "eficiencia_regulatoria",
+      "puntos": 0,
+      "peso_total": 0.0,
+      "titulo": {
+        "es": "Libertad de entrada a mercados",
+        "en": "Freedom to enter markets"
+      },
+      "definicion": {
+        "es": "Apertura de mercados, permisos para operar y distorsiones al entorno de negocios. Market openness, business permits and distortions of the business environment.\n  Dato del Fraser Institute, organización de orientación libertaria.\nen: >\n  Data from the Fraser Institute, a libertarian-leaning organization.\n"
+      },
+      "subfactores": null,
+      "superpone_con": "hf_business_freedom",
+      "significa_100": {
+        "es": "entrada a los mercados sin trabas",
+        "en": "unobstructed market entry"
+      },
+      "externo": true,
+      "formula": null,
+      "fuente": null,
+      "reproducible": "fuentes",
+      "normalizacion": {
+        "tipo": "escala_fija",
+        "min": 0,
+        "max": 10
+      },
+      "direccion": "mas_es_mas_libre"
+    }
+  },
+  "eje_cumplimiento": {
+    "titulo": {
+      "es": "Estado de derecho",
+      "en": "Rule of law"
+    },
+    "definicion": {
+      "es": "Promedio de los tres componentes de Estado de derecho de Heritage. Se usa como segundo eje porque un Estado pequeño donde los contratos no se cumplen no es lo mismo que un Estado pequeño donde sí se cumplen.\n",
+      "en": "Average of Heritage's three rule of law components. Used as a second axis because a small state where contracts go unenforced is not the same as a small state where they are enforced.\n"
+    },
+    "componentes": [
+      {
+        "serie": "hf_property_rights",
+        "peso": 0.3333,
+        "direccion": "mas_es_mas_libre",
+        "normalizacion": {
+          "tipo": "escala_fija",
+          "min": 0,
+          "max": 100
+        }
+      },
+      {
+        "serie": "hf_judicial_effectiveness",
+        "peso": 0.3333,
+        "direccion": "mas_es_mas_libre",
+        "normalizacion": {
+          "tipo": "escala_fija",
+          "min": 0,
+          "max": 100
+        }
+      },
+      {
+        "serie": "hf_government_integrity",
+        "peso": 0.3334,
+        "direccion": "mas_es_mas_libre",
+        "normalizacion": {
+          "tipo": "escala_fija",
+          "min": 0,
+          "max": 100
+        }
+      }
+    ]
+  },
+  "externo_puntos_cero": [
+    "z_propiedad_estatal",
+    "z_inversion_publica",
+    "z_controles_capital",
+    "z_regulacion_credito",
+    "z_consumo_publico",
+    "z_entrada_mercados"
+  ]
+}
