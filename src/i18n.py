@@ -651,21 +651,29 @@ T = {
     "calc_peso": {"es": "Peso", "en": "Weight"},
     "calc_puntaje": {"es": "Puntaje", "en": "Score"},
     "intro_pagina": {
-        "es": "La palabra «libertad» está en disputa, y los índices que dicen "
+        "es": "La palabra «libertad» está en disputa y los índices que dicen "
               "medirla toman decisiones que casi nunca se ven"
               "|"
-              ". Esta página reconstruye el Index of Economic Freedom de The "
-              "Heritage Foundation con sus propios datos, y muestra dónde su "
+              ". Esta página pretende resolver este problema. "
+              "Primero reconstruye el Index of Economic Freedom de The "
+              "Heritage Foundation con sus propios datos y muestra dónde su "
               "cálculo se aparta de su propia definición: qué mide, qué no "
-              "mide, y qué pasa con el ranking cuando se cambian los pesos.",
+              "mide, y qué pasa con el ranking cuando se cambian los pesos. "
+              "Esto nos permite armar un nuevo índice que presentamos como "
+              "«Verdadero índice de libertad económica» y que puede ser "
+              "escrutado en detalle.",
         "en": "The word \u201cfreedom\u201d is contested, and the indices that "
               "claim to measure it make decisions that are rarely visible"
               "|"
-              ". This "
-              "page reconstructs The Heritage Foundation's Index of Economic "
-              "Freedom from its own data, and shows where its computation "
-              "departs from its own definition: what it measures, what it does "
-              "not, and what happens to the ranking when the weights change."},
+              ". This page sets out to address that. "
+              "It first reconstructs The Heritage Foundation's Index of "
+              "Economic Freedom from its own data and shows where its "
+              "computation departs from its own definition: what it measures, "
+              "what it does not, and what happens to the ranking when the "
+              "weights change. That allows us to build a new index, presented "
+              "here as the \u201cTrue index of economic freedom\u201d, which "
+              "can be scrutinized in detail.",
+    },
     "volver_defecto": {"es": "Volver al índice por defecto",
                        "en": "Back to the default index"},
     "ver_razones": {
