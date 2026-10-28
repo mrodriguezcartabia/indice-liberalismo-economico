@@ -66,7 +66,9 @@ for etiqueta, extra in [("Heritage", {}),
                         ("tutorial abierto", {"tutorial": True}),
                         ("todo en cero salvo uno",
                          {"puntos": {k: (10 if k == "hf_tax_burden" else 0)
-                                     for k in f0["componentes"]}})]:
+                                     for k in f0["componentes"]}}),
+                        ("en inglés", {"lang": "en"}),
+                        ("en inglés con tutorial", {"lang": "en", "tutorial": True})]:
     ST.session_state = Estado({**BASE, **extra})
     ns["ss"] = ST.session_state
     ns["main"]()
