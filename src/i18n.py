@@ -660,7 +660,7 @@ T = {
               "cálculo se aparta de su propia definición: qué mide, qué no "
               "mide, y qué pasa con el ranking cuando se cambian los pesos. "
               "Esto nos permite armar un nuevo índice que presentamos como "
-              "«Verdadero índice de libertad económica» y que puede ser "
+              "«Índice de Liberalismo económico» y que puede ser "
               "escrutado en detalle.",
         "en": "The word \u201cfreedom\u201d is contested, and the indices that "
               "claim to measure it make decisions that are rarely visible"
@@ -671,7 +671,7 @@ T = {
               "computation departs from its own definition: what it measures, "
               "what it does not, and what happens to the ranking when the "
               "weights change. That allows us to build a new index, presented "
-              "here as the \u201cTrue index of economic freedom\u201d, which "
+              "here as the \u201cEconomic Liberalism Index\u201d, which "
               "can be scrutinized in detail.",
     },
     "volver_defecto": {"es": "Volver al índice por defecto",

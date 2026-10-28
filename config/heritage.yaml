@@ -625,6 +625,7 @@ eje_cumplimiento:
 presets:
   heritage:
     nombre: {es: "Heritage", en: "Heritage"}
+    corto: {es: "Heritage", en: "Heritage"}
     descripcion:
       es: >
         La ponderación oficial: los doce componentes con diez puntos cada uno.
@@ -654,10 +655,11 @@ presets:
              z_regulacion_credito: 0,
              z_consumo_publico: 0,
              z_entrada_mercados: 0}
-  verdadero:
+  liberalismo:
     nombre:
-      es: "Verdadero índice de libertad económica"
-      en: "True index of economic freedom"
+      es: "Índice de Liberalismo económico"
+      en: "Economic Liberalism Index"
+    corto: {es: "Liberalismo", en: "Liberalism"}
     descripcion:
       es: >
         Dieciséis componentes. Deja fuera los cinco que no miden reglas:

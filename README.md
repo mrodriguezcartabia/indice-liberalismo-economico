@@ -1,4 +1,4 @@
-# Índice Z
+# Índice de Liberalismo económico
 
 Página pública para comparar índices de libertad económica bajo distintas
 ponderaciones, usando datos publicados por terceros.

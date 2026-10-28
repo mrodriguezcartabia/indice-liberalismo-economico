@@ -59,10 +59,10 @@ exec(compile(src, str(ruta), "exec"), ns)
 BASE = {"lang": "es", "puntos": None, "tutorial": False, "ver": 0,
         "tut_paso": 0, "tut_notas": {}, "esc": False}
 f0 = ns["cargar"]()["f"]
-Z = f0["presets"]["verdadero"]["puntos"]
+Z = f0["presets"]["liberalismo"]["puntos"]
 
 for etiqueta, extra in [("Heritage", {}),
-                        ("preset verdadero", {"puntos": Z, "ver": 1}),
+                        ("preset liberalismo", {"puntos": Z, "ver": 1}),
                         ("tutorial abierto", {"tutorial": True}),
                         ("todo en cero salvo uno",
                          {"puntos": {k: (10 if k == "hf_tax_burden" else 0)
