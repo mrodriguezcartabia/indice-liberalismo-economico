@@ -1,7 +1,7 @@
-# App: Índice de Liberalismo Económico
+# App: Índice de Liberalismo económico
 
 ## Qué es
-Página que compara la réplica del Index of Economic Freedom de Heritage con un índice propio, el Índice de Liberalismo Económico, que pone arriba a los países con menor presencia del Estado. Un tercer índice lo arma el visitante con sus pesos. App en Streamlit publicada en Streamlit Cloud desde la rama main de GitHub. La app es bilingüe (español/inglés): todo texto visible va en los dos idiomas.
+Página que compara la réplica del Index of Economic Freedom de Heritage con un índice propio, el Índice de Liberalismo económico, que pone arriba a los países con menor presencia del Estado. Un tercer índice lo arma el visitante con sus pesos. App en Streamlit publicada en Streamlit Cloud desde la rama main de GitHub. La app es bilingüe (español/inglés): todo texto visible va en los dos idiomas.
 
 ## Idioma
 - Conversación conmigo: español rioplatense.

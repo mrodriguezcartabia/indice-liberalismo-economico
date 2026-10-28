@@ -606,7 +606,7 @@ def main():
     L = ss.lang
     claves = list(f["componentes"])
     presets = f.get("presets", {})
-    POR_DEFECTO = "verdadero" if "verdadero" in presets else "heritage"
+    POR_DEFECTO = "liberalismo"
     orig = presets[POR_DEFECTO]["puntos"]
 
     def preset_activo(pts) -> str | None:
@@ -812,7 +812,7 @@ def main():
     color = paleta(f)
     activos = [c for c in claves if pesos_comp.get(c, 0) > 0]
     n_pub = max(int(vivo.publicable.sum()), 1)
-    orden_ref = [n for n in ("verdadero", "heritage") if n in referencias]
+    orden_ref = [n for n in (POR_DEFECTO, "heritage") if n in referencias]
     tabla = vivo[vivo.publicable].nlargest(min(int(cuantos), n_pub), "indice")
 
     # ---------------- columna de acciones ----------------
@@ -921,7 +921,7 @@ def main():
             f'<div>{t("col_pais", L)}</div><div>{t("col_aporte", L)}</div>'
             f'<div style="text-align:right">{t("col_puntaje", L)}</div>'
             + "".join(f'<div style="text-align:right">'
-                      f'{txt(presets[n]["nombre"], L).split()[0]}</div>'
+                      f'{txt(presets[n]["corto"], L)}</div>'
                       for n in orden_ref) + '</div>',
         ]
         bloque += [fila(i, r, i in seguidos) for i, r in tabla.iterrows()]

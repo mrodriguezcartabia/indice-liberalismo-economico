@@ -99,6 +99,10 @@
         "es": "Heritage",
         "en": "Heritage"
       },
+      "corto": {
+        "es": "Heritage",
+        "en": "Heritage"
+      },
       "descripcion": {
         "es": "La ponderación oficial: los doce componentes con diez puntos cada uno. Como cada categoría agrupa tres componentes, las cuatro terminan pesando 25%. Ese 25% no es una decisión declarada: es consecuencia de cuántos componentes tiene cada una.\n",
         "en": "The official weighting: the twelve components with ten points each. Since each category groups three components, all four end up weighing 25%. That 25% is not a declared decision: it follows from how many components each one has.\n"
@@ -124,10 +128,14 @@
         "z_entrada_mercados": 0
       }
     },
-    "verdadero": {
+    "liberalismo": {
       "nombre": {
-        "es": "Verdadero índice de libertad económica",
-        "en": "True index of economic freedom"
+        "es": "Índice de Liberalismo económico",
+        "en": "Economic Liberalism Index"
+      },
+      "corto": {
+        "es": "Liberalismo",
+        "en": "Liberalism"
       },
       "descripcion": {
         "es": "Dieciséis componentes. Deja fuera los cinco que no miden reglas: integridad del gobierno y las libertades de inversión y financiera por ser evaluaciones cualitativas; libertad de empresa porque mide desarrollo; y libertad laboral porque su fórmula compara contra el promedio mundial y produce resultados que no se sostienen. Suma los nueve componentes de Fraser que miden la presencia del Estado, ausentes del índice de Heritage. Ningún par de componentes mide lo mismo: los tres de Fraser que se superponían con componentes de Heritage quedaron fuera, así que los trece pesan igual sin que ninguna dimensión se cuente dos veces.\n",
