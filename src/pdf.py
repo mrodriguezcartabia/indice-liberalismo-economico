@@ -14,6 +14,12 @@ TENUE = (107, 122, 114)
 SENAL = (15, 107, 92)
 LINEA = (213, 218, 210)
 
+# Helvetica sólo cubre latin-1: las comillas y rayas tipográficas de los textos
+# se pasan a su equivalente simple y cualquier otro carácter se reemplaza por "?".
+SIMPLES = str.maketrans({"\u201c": '"', "\u201d": '"', "\u2018": "'",
+                         "\u2019": "'", "\u2013": "-", "\u2014": "-",
+                         "\u2026": "..."})
+
 
 class Hoja(FPDF):
     def __init__(self, pie: str):
@@ -27,6 +33,10 @@ class Hoja(FPDF):
         self.set_text_color(*TENUE)
         self.cell(0, 4, self.pie_texto, align="L")
         self.cell(0, 4, str(self.page_no()), align="R")
+
+    def normalize_text(self, text):
+        text = text.translate(SIMPLES).encode("latin-1", "replace").decode("latin-1")
+        return super().normalize_text(text)
 
 
 def generar(titulo: str, subtitulo: str, filas: list[tuple],
