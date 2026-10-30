@@ -47,10 +47,10 @@ como consideren. Reponderar su índice es un uso previsto por sus autores.
 
 | | |
 |---|---|
-| Dataset | Economic Freedom of the World 2025 Annual Report |
+| Dataset | Economic Freedom of the World 2026 Annual Report (publicado el 6 de octubre de 2026) |
 | Descarga | `https://www.fraserinstitute.org/economic-freedom/dataset` |
-| Hoja | `EFW Index 1970-2023` · encabezado en la fila 3 |
-| Contenido | 165 países, series anuales 1970–2023, 87 columnas |
+| Hoja | `EFW Ratings` · encabezado en la fila 3 |
+| Contenido | 165 países, series anuales 1970–2024, 87 columnas |
 | Registro | no requiere |
 
 Todos los componentes vienen en **escala 0 a 10, donde 10 significa menos
@@ -59,6 +59,52 @@ estatal figura como `IE State ownership` —con i mayúscula en lugar de `1E`—
 errata del original.
 
 ---
+
+### 3 · Series con descarga automática
+
+Se bajan con `python src/descargar.py` desde la API oficial de cada organismo y
+quedan en `data/raw/manual/`. No pasan por sitios que recopilan datos de
+terceros: así cada serie tiene una sola definición y el año de cada país a la
+vista.
+
+**Presión fiscal** (`ocde_presion_fiscal`)
+
+| | |
+|---|---|
+| Publicador | OCDE — Centre for Tax Policy and Administration |
+| Dataset | Global Revenue Statistics Database (`OECD.CTP.TPS`, `DSD_REV_COMP_GLOBAL@DF_RSGLOBAL`) |
+| Serie | Total tax revenue, general government (S13), % of GDP |
+| API | `https://sdmx.oecd.org/public/rest/data/OECD.CTP.TPS,DSD_REV_COMP_GLOBAL@DF_RSGLOBAL,/.TAX_REV.S13._T._T.PT_B1GQ.A` |
+| Contenido | 142 países, 1990–2024 |
+| Registro | no requiere |
+
+**Gasto público** (`fmi_gasto_publico`)
+
+| | |
+|---|---|
+| Publicador | Fondo Monetario Internacional |
+| Dataset | World Economic Outlook (`IMF.RES:WEO`), indicador `GGX_NGDP` |
+| Serie | General government total expenditure, % of GDP |
+| Página | `https://data.imf.org/en/datasets/IMF.RES:WEO` |
+| API | `https://api.imf.org/external/sdmx/2.1/data/IMF.RES,WEO/*.GGX_NGDP.A` |
+| Contenido | 197 países, 1980–2025. Se descartan las proyecciones: sólo años hasta `LATEST_ACTUAL_ANNUAL_DATA` de cada país |
+| Cita sugerida por el FMI | International Monetary Fund. World Economic Outlook (WEO), https://data.imf.org/en/datasets/IMF.RES:WEO |
+| Términos | © International Monetary Fund. https://www.imf.org/external/terms.htm |
+
+El FMI usa `KOS` para Kosovo y `WBG` para Palestina; el script los pasa a los
+ISO3 del proyecto (`XKX`, `PSE`).
+
+**Heritage** también se baja sola (`python src/descargar.py heritage`): la
+edición indicada en `meta.vintage` del config, desde la dirección de descarga
+de la tabla de arriba. Si ya existe la edición del año siguiente, el script
+avisa pero no la carga, porque cambia la fecha de corte y la cita.
+
+**Actualización mensual:** `.github/workflows/actualizar-datos.yml` corre estas
+descargas el día 5 de cada mes y, si hay datos nuevos, abre un pull request
+para revisarlos antes de publicar.
+
+**Fraser no tiene descarga automática:** su sitio bloquea las descargas que no
+vienen de un navegador. Se baja a mano una vez por año, con la edición nueva.
 
 ## Cargar los datos
 
@@ -106,8 +152,8 @@ Resultado esperado: 184 países, validación con diferencia máxima de 0,067.
 ### Comando para el índice Z
 
 ```bash
-python src/cargar.py convertir ~/Descargas/efotw-2025-master-index-data-for-researchers-iso.xlsx \
-  --saltar 3 --pais "Countries" --col-anio "Year" --varios \
+python src/cargar.py convertir ~/Descargas/efotw-2026-master-index-data-for-researchers-iso.xlsx \
+  --hoja "EFW Ratings" --saltar 3 --pais "Countries" --col-anio "Year" --varios \
   "1A Government consumption=z_consumo_publico" \
   "1B  Transfers and subsidies=z_transferencias" \
   "1D  Top marginal tax rate=z_alicuotas" \
@@ -118,7 +164,7 @@ python src/cargar.py convertir ~/Descargas/efotw-2025-master-index-data-for-rese
   "5A  Credit market regulation=z_regulacion_credito" \
   "Area 2 Legal System & Property Rights -- With Gender Adjustment=z_area2"
 
-python src/build.py --config config/z.yaml
+python src/build.py --config config/heritage.yaml
 ```
 
 Los espacios dobles y el `IE` con i mayúscula son literales: copiar el bloque,
@@ -178,7 +224,7 @@ El componente de propiedad estatal de Fraser se deriva de la variable
 ## Ampliaciones posibles
 
 **Serie histórica.** La página de descargas de Heritage permite seleccionar
-varios años; Fraser cubre 1970–2023 en el mismo archivo. El pipeline ya conserva
+varios años; Fraser cubre 1970–2024 en el mismo archivo. El pipeline ya conserva
 todos los años, así que basta con cargar más datos.
 
 **Penalizaciones despejadas.** Con inflación del FMI World Economic Outlook y

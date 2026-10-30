@@ -1,0 +1,78 @@
+# Una vez por mes baja las fuentes automáticas (OCDE, FMI, Heritage),
+# regenera el índice y corre la prueba de humo. Si hay datos nuevos, abre un
+# pull request para revisarlo antes de publicar: nada llega a main solo.
+# Fraser no está: se carga a mano (ver recordatorio-fraser.yml).
+name: Actualizar datos
+
+on:
+  schedule:
+    - cron: "0 12 5 * *"      # día 5 de cada mes, 9:00 de Argentina
+  workflow_dispatch:           # para correrlo a mano desde la pestaña Actions
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Bajar las fuentes
+        id: bajar
+        continue-on-error: true      # si una falla, se publican las demás
+        run: python src/descargar.py
+
+      - name: Regenerar el índice
+        run: python src/build.py --config config/heritage.yaml
+
+      - name: Prueba de humo
+        run: python src/prueba_humo.py
+
+      - name: Proponer los cambios
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: datos-automaticos
+          delete-branch: true
+          add-paths: data/
+          commit-message: "Datos actualizados automáticamente"
+          title: "Datos actualizados automáticamente"
+          body: |
+            Actualización mensual de las fuentes con descarga automática:
+
+            - OCDE, Global Revenue Statistics Database (presión fiscal)
+            - FMI, World Economic Outlook (gasto público)
+            - The Heritage Foundation, Index of Economic Freedom (edición vigente)
+
+            Generado por `.github/workflows/actualizar-datos.yml`. Revisar los
+            cambios y la app antes de aceptar (merge): al aceptarlo se publica.
+
+      - name: Avisar si Heritage publicó una edición nueva
+        if: steps.bajar.outputs.heritage_nueva != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANIO: ${{ steps.bajar.outputs.heritage_nueva }}
+        run: |
+          titulo="Heritage: cargar Index of Economic Freedom $ANIO"
+          if ! gh issue list --state all --search "\"$titulo\" in:title" --json title \
+               --jq '.[].title' | grep -Fxq "$titulo"; then
+            gh issue create --title "$titulo" --body "Heritage publicó la edición $ANIO.
+          Pasar a una edición nueva cambia meta.vintage, la fecha de corte y la cita
+          de la fuente en config/heritage.yaml y docs/FUENTES.md. Pedíselo a Claude
+          Code: \"Cargá la edición $ANIO de Heritage\"."
+          fi
+
+      - name: Marcar error si alguna fuente falló
+        if: steps.bajar.outcome == 'failure'
+        run: |
+          echo "Alguna fuente no se pudo bajar: ver el paso 'Bajar las fuentes'."
+          exit 1

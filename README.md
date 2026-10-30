@@ -14,7 +14,6 @@ pip install -r requirements.txt
 
 # cargar datos y construir (comandos exactos en docs/FUENTES.md)
 python src/build.py --config config/heritage.yaml
-python src/build.py --config config/z.yaml
 
 streamlit run app/streamlit_app.py
 ```
@@ -23,7 +22,6 @@ streamlit run app/streamlit_app.py
 
 ```
 config/heritage.yaml   réplica del índice de Heritage, con procedencia completa
-config/z.yaml          índice Z, sobre componentes publicados por Fraser
 src/build.py           pipeline: panel tidy -> normalización -> pilares -> vintage
 src/cargar.py          conversor de planillas descargadas al formato del proyecto
 src/normalize.py       escalas 0-100 y agregación en dos niveles

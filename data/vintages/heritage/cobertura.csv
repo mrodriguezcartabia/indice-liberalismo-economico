@@ -11,9 +11,11 @@ hf_monetary_freedom,Libertad monetaria,182
 hf_trade_freedom,Libertad comercial,177
 hf_investment_freedom,Libertad de inversión,177
 hf_financial_freedom,Libertad financiera,177
-z_propiedad_estatal,Propiedad estatal de la economía,4942
-z_inversion_publica,Inversión pública,4562
-z_controles_capital,Controles de capital,4421
-z_regulacion_credito,Regulación del crédito,4790
-z_consumo_publico,Consumo público,4691
-z_entrada_mercados,Libertad de entrada a mercados,4125
+z_propiedad_estatal,Propiedad estatal de la economía,5104
+z_inversion_publica,Inversión pública,4723
+z_controles_capital,Controles de capital,4585
+z_regulacion_credito,Regulación del crédito,5024
+z_consumo_publico,Consumo público,4800
+ocde_presion_fiscal,Presión fiscal,4048
+fmi_gasto_publico,Gasto público (FMI),6720
+z_entrada_mercados,Libertad de entrada a mercados,4290

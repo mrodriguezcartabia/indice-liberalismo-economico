@@ -1,0 +1,30 @@
+# Recordatorio anual para cargar la edición nueva del Economic Freedom of the
+# World (Fraser Institute). Fraser no permite descargas automáticas, así que
+# esto sólo abre un aviso (issue) con el instructivo de docs/CARGAR_FRASER.md.
+name: Recordatorio Fraser
+
+on:
+  schedule:
+    - cron: "0 12 15 10 *"    # 15 de octubre, 9:00 de Argentina
+  workflow_dispatch:           # para probarlo a mano desde la pestaña Actions
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Abrir el aviso (uno por año)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          titulo="Fraser: cargar Economic Freedom of the World $(date +%Y)"
+          if gh issue list --state all --search "\"$titulo\" in:title" --json title \
+               --jq '.[].title' | grep -Fxq "$titulo"; then
+            echo "Ya existe el aviso de este año."
+          else
+            gh issue create --title "$titulo" --body-file docs/CARGAR_FRASER.md
+          fi

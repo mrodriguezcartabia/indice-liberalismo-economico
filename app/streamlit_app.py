@@ -228,7 +228,7 @@ def contraste(f, pesos_comp):
     return {"cmax": mx[0], "nmax": mx[1], "pmax": max(mx[2]),
             "cmin": mn[0], "nmin": mn[1], "pmin": min(mn[2]),
             "veces": max(mx[2]) / min(mn[2])}
-REPO = "github.com/tu-usuario/indice-z"
+REPO = "github.com/mrodriguezcartabia/indice-liberalismo-economico"
 ENLACES = {
     "fuente_metodologia":
         "https://static.heritage.org/index/pdf/2026/"
@@ -605,6 +605,7 @@ def main():
     f, m = datos["f"], datos["f"]["meta"]
     L = ss.lang
     claves = list(f["componentes"])
+    claves_codigo = f["orden_codigo"]      # orden fijo del código compartible
     presets = f.get("presets", {})
     POR_DEFECTO = "liberalismo"
     orig = presets[POR_DEFECTO]["puntos"]
@@ -702,7 +703,7 @@ def main():
                                if i["pilar"] == pil)
     pesos = {"comp": pesos_comp, "pilar": pesos_pilar}
 
-    codigo = cod.codificar(m["sigla"], puntos, claves)
+    codigo = cod.codificar(m["sigla"], puntos, claves_codigo)
     act = preset_activo(puntos)
 
     # ---------------- encabezado ----------------
@@ -807,6 +808,16 @@ def main():
         izq.markdown(f'<div class="aviso">'
                     f'{t("aviso_sin_dato", L).format(p=", ".join(huerfanos), a=anio)}'
                     f'</div>', unsafe_allow_html=True)
+    # Pares con correlación >= umbral_superposicion (los calcula build.py).
+    for sp in f.get("superposiciones", []):
+        if pesos_comp.get(sp["a"], 0) <= 0 or pesos_comp.get(sp["b"], 0) <= 0:
+            continue
+        r = f'{sp["r"]:.2f}'
+        aviso = t("aviso_superposicion", L).format(
+            a=txt(f["componentes"][sp["a"]]["titulo"], L),
+            b=txt(f["componentes"][sp["b"]]["titulo"], L),
+            r=r.replace(".", ",") if L == "es" else r)
+        izq.markdown(f'<div class="aviso">{aviso}</div>', unsafe_allow_html=True)
 
     # ---------------- pestañas ----------------
     color = paleta(f)
@@ -844,7 +855,7 @@ def main():
         e = st.text_input("cod", placeholder=t("aplicar_codigo", L),
                           label_visibility="collapsed")
         if st.button(t("aplicar_codigo", L), use_container_width=True) and e:
-            r = cod.decodificar(e, claves)
+            r = cod.decodificar(e, claves_codigo)
             if r:
                 cargar_puntos(r)
                 st.rerun()

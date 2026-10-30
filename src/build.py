@@ -1,7 +1,6 @@
 """Pipeline: panel tidy -> normalización -> pilares -> vintage.
 
     python src/build.py --config config/heritage.yaml
-    python src/build.py --config config/z.yaml
 
 Diferencias con la versión anterior:
   - conserva TODOS los años en lugar de quedarse con el último
@@ -57,6 +56,13 @@ def cargar_config(path: Path) -> dict:
     if total <= 0:
         raise SystemExit("Ningún componente tiene puntos asignados.")
     cfg["_puntos_totales"] = total
+    # El código compartible depende de este orden: si falta un componente, un
+    # código publicado se leería como otra configuración sin dar error.
+    orden, comps = cfg.get("orden_codigo", []), list(cfg["componentes"])
+    if sorted(orden) != sorted(comps):
+        raise SystemExit(
+            "orden_codigo no coincide con los componentes. Faltan: "
+            f"{sorted(set(comps) - set(orden))} · sobran: {sorted(set(orden) - set(comps))}")
     return cfg
 
 
@@ -103,7 +109,7 @@ def construir(cfg: dict, panel: pd.DataFrame) -> dict:
     comps = cfg["componentes"]
     idx = ["iso3", "anio"]
     # --- alinear series rezagadas al año del vintage ------------------------
-    # Una fuente puede terminar antes que el índice (Fraser llega a 2023 y
+    # Una fuente puede terminar antes que el índice (Fraser llega a 2024 y
     # Heritage a 2026). En ese caso se usa la última observación disponible y
     # se declara de qué año es. No es imputación: es un dato real con su fecha
     # a la vista. El propio Heritage trabaja con datos rezagados respecto de su
@@ -163,6 +169,9 @@ def construir(cfg: dict, panel: pd.DataFrame) -> dict:
     for c in correlaciones:
         if abs(c["r"]) > 0.7:
             print(f"  ! doble conteo: {c['a']} y {c['b']} r={c['r']} en {c['pilar']}")
+    # La superposición no se marca a mano: sale de la correlación medida.
+    umbral = float(cfg["umbral_superposicion"])
+    superposiciones = [c for c in correlaciones if c["r"] >= umbral]
 
     # --- índice: promedio ponderado por puntos sobre los componentes -------
     total_pts = cfg["_puntos_totales"]
@@ -234,10 +243,12 @@ def construir(cfg: dict, panel: pd.DataFrame) -> dict:
             "panel": ancho.reset_index(), "scores": scores.reset_index(),
             "indice": ind, "cobertura": pd.DataFrame(cobertura_comp),
             "correlaciones": pd.DataFrame(correlaciones),
+            "superposiciones": superposiciones,
             "validacion": validacion}
 
 
-def volcar_fuentes(cfg: dict, validacion: dict, rezagos: dict | None = None) -> dict:
+def volcar_fuentes(cfg: dict, validacion: dict, rezagos: dict | None = None,
+                   superposiciones: list[dict] | None = None) -> dict:
     """Arma el JSON de procedencia que consume el panel de escrutinio.
 
     Se genera DESDE el config, nunca se escribe al lado. Si mañana cambia un
@@ -249,6 +260,9 @@ def volcar_fuentes(cfg: dict, validacion: dict, rezagos: dict | None = None) -> 
         "validacion": validacion,
         "rezagos": rezagos or {},
         "presets": cfg.get("presets", {}),
+        "orden_codigo": cfg["orden_codigo"],
+        "umbral_superposicion": cfg["umbral_superposicion"],
+        "superposiciones": superposiciones or [],
         "puntos_totales": cfg["_puntos_totales"],
         "pilares": {k: {"titulo": v.get("titulo"),
                         "descripcion": v.get("descripcion")}
@@ -258,7 +272,6 @@ def volcar_fuentes(cfg: dict, validacion: dict, rezagos: dict | None = None) -> 
                 "peso_total": round(v.get("puntos", 0) / cfg["_puntos_totales"], 6),
                 "titulo": v.get("titulo"), "definicion": v.get("definicion"),
                 "subfactores": v.get("subfactores"),
-                "superpone_con": v.get("superpone_con"),
                 "significa_100": v.get("significa_100"),
                 "externo": bool(v.get("externo")),
                 "formula": v.get("formula"), "fuente": v.get("fuente"),
@@ -286,9 +299,14 @@ def main() -> None:
     destino = VINTAGES / cfg["meta"]["carpeta"]
     destino.mkdir(parents=True, exist_ok=True)
     for nombre in ("panel", "scores", "indice", "cobertura", "correlaciones"):  # noqa
-        salidas[nombre].to_csv(destino / f"{nombre}.csv", index=False)
+        # Precisión fija: sin esto, distintas versiones de pandas escriben el
+        # mismo número con otra cola de decimales y el archivo "cambia" sin
+        # que cambie ningún dato.
+        salidas[nombre].to_csv(destino / f"{nombre}.csv", index=False,
+                               float_format="%.10g")
     (destino / "fuentes.json").write_text(
-        json.dumps(volcar_fuentes(cfg, salidas["validacion"], salidas["rezagos"]),
+        json.dumps(volcar_fuentes(cfg, salidas["validacion"], salidas["rezagos"],
+                                  salidas["superposiciones"]),
                    indent=2, ensure_ascii=False), encoding="utf-8")
     (destino / "validacion.json").write_text(
         json.dumps(salidas["validacion"], indent=2, ensure_ascii=False),

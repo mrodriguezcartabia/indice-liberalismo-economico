@@ -73,4 +73,28 @@ for etiqueta, extra in [("Heritage", {}),
     ns["ss"] = ST.session_state
     ns["main"]()
     print(f"  main() OK — {etiqueta}")
+
+# Códigos publicados antes de sumar componentes: tienen que seguir leyéndose
+# igual. Si esto falla, un PDF o un link viejo mostraría otra configuración.
+import codigo as cod
+claves_cod = f0["orden_codigo"]
+viejas = claves_cod[2:]                    # las 18 claves anteriores a OCDE y FMI
+mezcla = {c: 5 * (i % 4) for i, c in enumerate(viejas)}
+for viejo, esperado in [("HF-I7ZY0", f0["presets"]["heritage"]["puntos"]),
+                        ("HF-I6WSZ", f0["presets"]["liberalismo"]["puntos"]),
+                        ("HF-P0001-AQE4-GRPJ-AVGS-WS", mezcla)]:
+    leido = cod.decodificar(viejo, claves_cod)
+    assert leido and all(leido[k] == esperado.get(k, 0) for k in claves_cod), viejo
+print("  códigos publicados OK")
+
+# El aviso de superposición tiene que aparecer cuando los dos están activos.
+salida = []
+st.markdown = lambda x="", *a, **k: salida.append(str(x))
+ST.session_state = Estado({**BASE, "puntos": {k: (10 if k in ("hf_government_spending",
+                                                    "fmi_gasto_publico") else 0)
+                                              for k in f0["componentes"]}})
+ns["ss"] = ST.session_state
+ns["main"]()
+assert any("miden casi lo mismo" in x for x in salida), "no apareció el aviso de superposición"
+print("  aviso de superposición OK")
 print("prueba de humo superada")

@@ -438,20 +438,11 @@ componentes:
     fuente:
       columna: "IE State ownership"
       publicador: "Fraser Institute"
-      dataset: "Economic Freedom of the World 2025"
+      dataset: "Economic Freedom of the World 2026"
       url: "https://www.fraserinstitute.org/economic-freedom/dataset"
       insumos: "V-Dem, variable v2clstown"
       escala_original: "0–10, 10 = menos Estado"
-      cobertura: "165 países, hasta 2023"
-      advertencia:
-        es: >
-          Dato del Fraser Institute, organización de orientación libertaria. Se
-          usa precisamente por eso: la dimensión que falta en Heritage la
-          publica una institución del mismo campo.
-        en: >
-          Data from the Fraser Institute, a libertarian-leaning organization.
-          It is used precisely for that reason: the dimension missing from
-          Heritage is published by an institution from the same camp.
+      cobertura: "162 países, hasta 2024"
     reproducible: fuentes
     alinear_al_vintage: true
     direccion: mas_es_mas_libre
@@ -471,16 +462,14 @@ componentes:
     fuente:
       columna: "1C  Government investment"
       publicador: "Fraser Institute"
-      dataset: "Economic Freedom of the World 2025"
+      dataset: "Economic Freedom of the World 2026"
       url: "https://www.fraserinstitute.org/economic-freedom/dataset"
       escala_original: "0–10, 10 = menos Estado"
-      cobertura: "161 países, hasta 2023"
+      cobertura: "161 países, hasta 2024"
       advertencia:
         es: >
-          Dato del Fraser Institute, organización de orientación libertaria. El
-          índice de Heritage no incluye ningún componente que mida esto.
+          El índice de Heritage no incluye ningún componente que mida esto.
         en: >
-          Data from the Fraser Institute, a libertarian-leaning organization.
           The Heritage index includes no component measuring this.
     reproducible: fuentes
     alinear_al_vintage: true
@@ -501,16 +490,14 @@ componentes:
     fuente:
       columna: "4Dii  Capital controls"
       publicador: "Fraser Institute"
-      dataset: "Economic Freedom of the World 2025"
+      dataset: "Economic Freedom of the World 2026"
       url: "https://www.fraserinstitute.org/economic-freedom/dataset"
       escala_original: "0–10, 10 = menos Estado"
-      cobertura: "165 países, hasta 2023"
+      cobertura: "165 países, hasta 2024"
       advertencia:
         es: >
-          Dato del Fraser Institute, organización de orientación libertaria. El
-          índice de Heritage no incluye ningún componente que mida esto.
+          El índice de Heritage no incluye ningún componente que mida esto.
         en: >
-          Data from the Fraser Institute, a libertarian-leaning organization.
           The Heritage index includes no component measuring this.
     reproducible: fuentes
     alinear_al_vintage: true
@@ -531,16 +518,14 @@ componentes:
     fuente:
       columna: "5A  Credit market regulation"
       publicador: "Fraser Institute"
-      dataset: "Economic Freedom of the World 2025"
+      dataset: "Economic Freedom of the World 2026"
       url: "https://www.fraserinstitute.org/economic-freedom/dataset"
       escala_original: "0–10, 10 = menos Estado"
-      cobertura: "164 países, hasta 2023"
+      cobertura: "164 países, hasta 2024"
       advertencia:
         es: >
-          Dato del Fraser Institute, organización de orientación libertaria. El
-          índice de Heritage no incluye ningún componente que mida esto.
+          El índice de Heritage no incluye ningún componente que mida esto.
         en: >
-          Data from the Fraser Institute, a libertarian-leaning organization.
           The Heritage index includes no component measuring this.
     reproducible: fuentes
     alinear_al_vintage: true
@@ -552,7 +537,6 @@ componentes:
     pilar: tamano_estado
     puntos: 0
     externo: true
-    superpone_con: "hf_government_spending"
     titulo: {es: "Consumo público", en: "Government consumption"}
     definicion:
       es: >
@@ -566,38 +550,115 @@ componentes:
     fuente:
       columna: "1A Government consumption"
       publicador: "Fraser Institute"
-      dataset: "Economic Freedom of the World 2025"
+      dataset: "Economic Freedom of the World 2026"
       url: "https://www.fraserinstitute.org/economic-freedom/dataset"
       escala_original: "0–10, 10 = menos Estado"
-      cobertura: "165 países, hasta 2023"
-      advertencia:
-        es: >
-          Dato del Fraser Institute, organización de orientación libertaria.
-        en: >
-          Data from the Fraser Institute, a libertarian-leaning organization.
+      cobertura: "165 países, hasta 2024"
     reproducible: fuentes
     alinear_al_vintage: true
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 10}
+
+  ocde_presion_fiscal:
+    significa_100: {es: "recaudación cero", en: "zero tax revenue"}
+    pilar: tamano_estado
+    puntos: 0
+    externo: true
+    titulo: {es: "Presión fiscal", en: "Tax revenue"}
+    definicion:
+      es: >
+        Recaudación tributaria total del gobierno general sobre PBI, incluidas
+        las contribuciones a la seguridad social. A diferencia de la carga
+        tributaria de Heritage, no mezcla alícuotas máximas con recaudación.
+      en: >
+        Total general government tax revenue over GDP, including social security
+        contributions. Unlike Heritage's tax burden, it does not mix top rates
+        with revenue.
+    formula: "100 − 0,03 · x²  (x = recaudación/PBI, misma forma que Heritage)"
+    fuente:
+      serie: "Total tax revenue, general government (S13), % of GDP"
+      publicador: "OCDE"
+      dataset: "Global Revenue Statistics Database (OECD.CTP.TPS, DF_RSGLOBAL)"
+      url: "https://sdmx.oecd.org/public/rest/data/OECD.CTP.TPS,DSD_REV_COMP_GLOBAL@DF_RSGLOBAL,/.TAX_REV.S13._T._T.PT_B1GQ.A"
+      cobertura: "142 países, 1990–2024"
+      descarga: "automática: python src/descargar.py ocde_presion_fiscal"
+    reproducible: total
+    alinear_al_vintage: true
+    direccion: menos_es_mas_libre
+    normalizacion: {tipo: cuadratica, alpha: 0.03}
+
+  fmi_gasto_publico:
+    significa_100: {es: "gasto público cero", en: "zero government spending"}
+    pilar: tamano_estado
+    puntos: 0
+    externo: true
+    titulo: {es: "Gasto público (FMI)", en: "Government expenditure (IMF)"}
+    definicion:
+      es: >
+        Gasto total del gobierno general sobre PBI, último año observado. Es el
+        mismo dato que Heritage promedia en tres años para su componente de
+        gasto público.
+      en: >
+        Total general government expenditure over GDP, latest observed year.
+        It is the same data Heritage averages over three years for its
+        government spending component.
+    formula: "100 − 0,03 · x²  (x = gasto/PBI, misma forma que Heritage)"
+    fuente:
+      serie: "GGX_NGDP — General government total expenditure, % of GDP"
+      publicador: "Fondo Monetario Internacional"
+      dataset: "World Economic Outlook (IMF.RES:WEO)"
+      url: "https://data.imf.org/en/datasets/IMF.RES:WEO"
+      cobertura: "197 países, 1980–2025, sin proyecciones"
+      descarga: "automática: python src/descargar.py fmi_gasto_publico"
+    reproducible: total
+    alinear_al_vintage: true
+    direccion: menos_es_mas_libre
+    normalizacion: {tipo: cuadratica, alpha: 0.03}
 
   z_entrada_mercados:
     significa_100: {es: "entrada a los mercados sin trabas", en: "unobstructed market entry"}
     pilar: eficiencia_regulatoria
     puntos: 0
     externo: true
-    superpone_con: "hf_business_freedom"
     titulo: {es: "Libertad de entrada a mercados", en: "Freedom to enter markets"}
     definicion:
       es: >
         Apertura de mercados, permisos para operar y distorsiones al entorno de negocios.
+      en: >
         Market openness, business permits and distortions of the business environment.
-          Dato del Fraser Institute, organización de orientación libertaria.
-        en: >
-          Data from the Fraser Institute, a libertarian-leaning organization.
+    fuente:
+      columna: "5D Freedom to enter markets and compete"
+      publicador: "Fraser Institute"
+      dataset: "Economic Freedom of the World 2026"
+      url: "https://www.fraserinstitute.org/economic-freedom/dataset"
+      escala_original: "0–10, 10 = menos Estado"
+      cobertura: "165 países, hasta 2024"
     reproducible: fuentes
     alinear_al_vintage: true
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 10}
+
+# ---------------------------------------------------------------------------
+# Dos componentes se consideran superpuestos (miden casi lo mismo) cuando su
+# correlación, calculada por build.py sobre todos los países y años, es mayor
+# o igual a este umbral. Con los dos activos, la app muestra un aviso.
+# ---------------------------------------------------------------------------
+umbral_superposicion: 0.9
+
+# ---------------------------------------------------------------------------
+# Orden de los componentes dentro del código compartible (src/codigo.py).
+# Es independiente del orden en pantalla. Un componente nuevo se agrega SIEMPRE
+# al principio de esta lista: así los códigos ya publicados se siguen leyendo
+# igual, con el componente nuevo en cero. build.py falla si falta alguno.
+# ---------------------------------------------------------------------------
+orden_codigo: [fmi_gasto_publico, ocde_presion_fiscal,
+               hf_property_rights, hf_judicial_effectiveness,
+               hf_government_integrity, hf_tax_burden, hf_government_spending,
+               hf_fiscal_health, hf_business_freedom, hf_labor_freedom,
+               hf_monetary_freedom, hf_trade_freedom, hf_investment_freedom,
+               hf_financial_freedom, z_propiedad_estatal, z_inversion_publica,
+               z_controles_capital, z_regulacion_credito, z_consumo_publico,
+               z_entrada_mercados]
 
 # ---------------------------------------------------------------------------
 # Eje vertical del grafico de dispersion. NO entra al puntaje.
@@ -654,7 +715,9 @@ presets:
              z_controles_capital: 0,
              z_regulacion_credito: 0,
              z_consumo_publico: 0,
-             z_entrada_mercados: 0}
+             z_entrada_mercados: 0,
+             ocde_presion_fiscal: 0,
+             fmi_gasto_publico: 0}
   liberalismo:
     nombre:
       es: "Índice de Liberalismo económico"
@@ -662,26 +725,30 @@ presets:
     corto: {es: "Liberalismo", en: "Liberalism"}
     descripcion:
       es: >
-        Dieciséis componentes. Deja fuera los cinco que no miden reglas:
-        integridad del gobierno y las libertades de inversión y financiera por
-        ser evaluaciones cualitativas; libertad de empresa porque mide
-        desarrollo; y libertad laboral porque su fórmula compara contra el
-        promedio mundial y produce resultados que no se sostienen. Suma los
-        nueve componentes de Fraser que miden la presencia del Estado, ausentes
-        del índice de Heritage.
-        Ningún par de componentes mide lo mismo: los tres de Fraser que se
-        superponían con componentes de Heritage quedaron fuera, así que los
-        trece pesan igual sin que ninguna dimensión se cuente dos veces.
+        Trece componentes con el mismo peso: siete de Heritage y seis de
+        Fraser. De Heritage deja fuera los cinco que no miden reglas: integridad
+        del gobierno y las libertades de inversión y financiera por ser
+        evaluaciones cualitativas; libertad de empresa porque mide desarrollo;
+        y libertad laboral porque su fórmula compara contra el promedio mundial
+        y produce resultados que no se sostienen. De Fraser suma los
+        componentes que miden la presencia del Estado y que el índice de
+        Heritage no tiene; quedaron fuera tres que se superponían con
+        componentes de Heritage.
+        Derechos de propiedad y eficacia judicial tienen una correlación mayor
+        a 0,9: miden casi lo mismo, y la página lo advierte porque con los dos
+        activos esa dimensión pesa el doble.
       en: >
-        Sixteen components. It leaves out the five that do not measure rules:
+        Thirteen equally weighted components: seven from Heritage and six from
+        Fraser. From Heritage it leaves out the five that do not measure rules:
         government integrity and investment and financial freedom, being
         qualitative assessments; business freedom, which measures development;
         and labor freedom, whose formula compares against the world average.
-        It adds the nine Fraser components measuring state presence, absent
-        from the Heritage index.
-        No pair of components measures the same thing: the three Fraser
-        components overlapping with Heritage ones were removed, so all thirteen
-        weigh equally without any dimension being counted twice.
+        From Fraser it adds the components measuring state presence that the
+        Heritage index lacks; three that overlapped with Heritage components
+        were left out.
+        Property rights and judicial effectiveness have a correlation above
+        0.9: they measure almost the same thing, and the page flags it because
+        with both active that dimension weighs twice.
     puntos: {hf_property_rights: 10,
              hf_judicial_effectiveness: 10,
              hf_government_integrity: 0,
@@ -699,7 +766,9 @@ presets:
              z_controles_capital: 10,
              z_regulacion_credito: 10,
              z_consumo_publico: 10,
-             z_entrada_mercados: 10}
+             z_entrada_mercados: 10,
+             ocde_presion_fiscal: 0,
+             fmi_gasto_publico: 0}
 
 solo_reportadas:
   hf_overall:

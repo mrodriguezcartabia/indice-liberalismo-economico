@@ -395,14 +395,15 @@ T = {
               "component name in the left panel to see the ranking as if that "
               "component weighed 100 and the rest zero."},
     "aviso_superposicion": {
-        "es": "«{a}» y «{b}» miden lo mismo con fuentes distintas. Con los dos "
-              "activos, esa dimensión pesa el doble sin que el porcentaje lo "
-              "diga: es el mismo problema de doble conteo que este proyecto le "
-              "señala a los índices compuestos.",
-        "en": "\u201c{a}\u201d and \u201c{b}\u201d measure the same thing from "
-              "different sources. With both active, that dimension weighs twice "
-              "without the percentage saying so: the same double-counting "
-              "problem this project points out in composite indices."},
+        "es": "«{a}» y «{b}» tienen una correlación de {r}: miden casi lo "
+              "mismo. Con los dos activos, esa dimensión pesa el doble sin que "
+              "el porcentaje lo diga: es el mismo problema de doble conteo que "
+              "este proyecto le señala a los índices compuestos.",
+        "en": "\u201c{a}\u201d and \u201c{b}\u201d have a correlation of {r}: "
+              "they measure almost the same thing. With both active, that "
+              "dimension weighs twice without the percentage saying so: the "
+              "same double-counting problem this project points out in "
+              "composite indices."},
     "critica": {"es": "Razones para un nuevo índice",
                 "en": "Reasons for a new index"},
     "crit_p0": {"es": "Por qué otro índice", "en": "Why another index"},
