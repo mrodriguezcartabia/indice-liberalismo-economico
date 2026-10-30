@@ -150,19 +150,19 @@
         "en": "Liberalism"
       },
       "descripcion": {
-        "es": "Trece componentes con el mismo peso: siete de Heritage y seis de Fraser. De Heritage deja fuera los cinco que no miden reglas: integridad del gobierno y las libertades de inversión y financiera por ser evaluaciones cualitativas; libertad de empresa porque mide desarrollo; y libertad laboral porque su fórmula compara contra el promedio mundial y produce resultados que no se sostienen. De Fraser suma los componentes que miden la presencia del Estado y que el índice de Heritage no tiene; quedaron fuera tres que se superponían con componentes de Heritage. Derechos de propiedad y eficacia judicial tienen una correlación mayor a 0,9: miden casi lo mismo, y la página lo advierte porque con los dos activos esa dimensión pesa el doble.\n",
-        "en": "Thirteen equally weighted components: seven from Heritage and six from Fraser. From Heritage it leaves out the five that do not measure rules: government integrity and investment and financial freedom, being qualitative assessments; business freedom, which measures development; and labor freedom, whose formula compares against the world average. From Fraser it adds the components measuring state presence that the Heritage index lacks; three that overlapped with Heritage components were left out. Property rights and judicial effectiveness have a correlation above 0.9: they measure almost the same thing, and the page flags it because with both active that dimension weighs twice.\n"
+        "es": "Diez componentes con el mismo peso, todos sobre el tamaño y la intervención del Estado en la economía. Del lado fiscal: carga tributaria y gasto público de Heritage, presión fiscal de la OCDE y consumo público de Fraser. Del lado de la intervención: libertad comercial de Heritage, y propiedad estatal, inversión pública, controles de capital, regulación del crédito y entrada a mercados de Fraser. No incluye los componentes de Estado de derecho (derechos de propiedad, efectividad judicial, integridad del gobierno): miden la calidad de las instituciones, no el tamaño del Estado. Esa dimensión se muestra aparte, en el eje vertical del gráfico de dispersión. Tampoco incluye salud fiscal ni libertad monetaria, que miden déficit, deuda e inflación.\n",
+        "en": "Ten equally weighted components, all about the size of the state and its intervention in the economy. On the fiscal side: Heritage's tax burden and government spending, the OECD's tax revenue and Fraser's government consumption. On the intervention side: Heritage's trade freedom, and Fraser's state ownership, government investment, capital controls, credit market regulation and freedom to enter markets. It does not include the rule-of-law components (property rights, judicial effectiveness, government integrity): they measure the quality of institutions, not the size of the state. That dimension is shown separately, on the vertical axis of the scatter chart. Nor does it include fiscal health or monetary freedom, which measure deficit, debt and inflation.\n"
       },
       "puntos": {
-        "hf_property_rights": 10,
-        "hf_judicial_effectiveness": 10,
+        "hf_property_rights": 0,
+        "hf_judicial_effectiveness": 0,
         "hf_government_integrity": 0,
         "hf_tax_burden": 10,
         "hf_government_spending": 10,
-        "hf_fiscal_health": 10,
+        "hf_fiscal_health": 0,
         "hf_business_freedom": 0,
         "hf_labor_freedom": 0,
-        "hf_monetary_freedom": 10,
+        "hf_monetary_freedom": 0,
         "hf_trade_freedom": 10,
         "hf_investment_freedom": 0,
         "hf_financial_freedom": 0,
@@ -172,7 +172,7 @@
         "z_regulacion_credito": 10,
         "z_consumo_publico": 10,
         "z_entrada_mercados": 10,
-        "ocde_presion_fiscal": 0,
+        "ocde_presion_fiscal": 10,
         "fmi_gasto_publico": 0
       }
     }

@@ -22,12 +22,12 @@ from __future__ import annotations
 
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "src"))
@@ -281,7 +281,6 @@ REFERENCIAS = [
     ("fuente_datos", ENLACES["fuente_datos"]),
     ("fuente_definicion", ENLACES["fuente_definicion"]),
     ("fuente_fraser", ENLACES["fuente_fraser"]),
-    ("fuente_vdem", "https://v-dem.net/data/the-v-dem-dataset/"),
     ("fuente_repo", ENLACES["fuente_repo"]),
 ]
 
@@ -389,7 +388,13 @@ def arbol_subfactores(f, L, compacto=False):
         st.caption(t("arbol_nota", L))
 
 
-@st.dialog(" ", width="large")
+def cerrar_tutorial():
+    ss.tutorial = False
+
+
+# Cerrar con la X también marca el tutorial como cerrado: si no, se volvía a
+# abrir en la ejecución siguiente y chocaba con otra ventana.
+@st.dialog(" ", width="large", on_dismiss=cerrar_tutorial)
 def tutorial(f, L):
     """Un componente por vez, en ventana flotante.
 
@@ -423,12 +428,12 @@ def tutorial(f, L):
 
         b1, b2, b3 = st.columns([1, 1, 1])
         b1.button(t("tut_anterior", L), disabled=paso == 0,
-                  use_container_width=True,
+                  width="stretch",
                   on_click=lambda: ss.__setitem__("tut_paso", paso - 1))
-        b2.button(t("tut_cancelar", L), use_container_width=True,
+        b2.button(t("tut_cancelar", L), width="stretch",
                   on_click=lambda: ss.__setitem__("tutorial", False))
         b3.button(t("tut_siguiente", L), type="primary",
-                  use_container_width=True,
+                  width="stretch",
                   on_click=lambda: ss.__setitem__("tut_paso", paso + 1))
         return
 
@@ -444,7 +449,7 @@ def tutorial(f, L):
         f'</b></div>' for k, v in f["pilares"].items()), unsafe_allow_html=True)
 
     b1, b2 = st.columns(2)
-    b1.button(t("tut_anterior", L), use_container_width=True,
+    b1.button(t("tut_anterior", L), width="stretch",
               on_click=lambda: ss.__setitem__("tut_paso", paso - 1))
 
     def aplicar():
@@ -452,7 +457,7 @@ def tutorial(f, L):
         ss.puntos = {c: notas[c] * 5 for c in comps}
         ss.ver += 1
 
-    b2.button(t("tut_aplicar", L), type="primary", use_container_width=True,
+    b2.button(t("tut_aplicar", L), type="primary", width="stretch",
               on_click=aplicar)
 
 
@@ -534,7 +539,7 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
                     t("calc_peso", L): f"{w:.4%}",
                     t("calc_aporte", L): round(float(aporte), 4),
                 })
-            st.dataframe(pd.DataFrame(filas), use_container_width=True,
+            st.dataframe(pd.DataFrame(filas), width="stretch",
                          hide_index=True)
             pub = datos["panel"]
             pub = pub[(pub.iso3 == elegido) & (pub.anio == anio)]
@@ -549,7 +554,7 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
         st.download_button(t("esc_descargar", L),
                            datos["ind"].to_csv(index=False).encode("utf-8"),
                            file_name=f"indice_{anio}.csv", mime="text/csv",
-                           use_container_width=True)
+                           width="stretch")
 
     # --- qué estás mirando ---
     with p[2]:
@@ -702,7 +707,7 @@ def main():
                         key=f"pt_{c}_{ss.ver}", label_visibility="collapsed")
             aplicado = st.form_submit_button(t("aplicar_pesos", L),
                                              type="primary",
-                                             use_container_width=True)
+                                             width="stretch")
         if aplicado:
             ss.puntos = dict(puntos)
             st.rerun()
@@ -732,12 +737,12 @@ def main():
                   else t("titulo_propio", L))
         st.markdown(f"# {titulo}")
         cabeza, cola = t("intro_pagina", L).split("|", 1)
-        detalle = (txt(presets[act].get("descripcion"), L) if act
-                   else t("sub_propio", L))
+        # "|" separa lo visible de lo que se abre con "…más"; es también el
+        # corte de párrafo. La descripción de cada índice no va acá: está en
+        # la ayuda del selector de índice.
         st.markdown(texto_plegable(
-            cabeza.strip(), cola.strip(), L,
-            extra=f'<br><br>{detalle}<br><br>'
-                  f'{t("ver_razones", L).format(b=t("critica", L))}'),
+            cabeza.strip(), "<br><br>" + cola.strip(), L,
+            extra=f'<br><br>{t("ver_razones", L).format(b=t("critica", L))}'),
             unsafe_allow_html=True)
     # ---------------- controles en horizontal ----------------
     ind_all = datos["ind"]
@@ -787,6 +792,10 @@ def main():
         format_func=nombre, help=t("seguir_ayuda", L))
     ss.sel_seg = list(seguidos)
 
+    # Streamlit admite una sola ventana por ejecución: si se pidió otra, el
+    # tutorial cede el lugar.
+    if ss.get("btn_critica") or ss.get("btn_ayuda"):
+        ss.tutorial = False
     if ss.tutorial:
         tutorial(f, L)
 
@@ -816,8 +825,14 @@ def main():
         w_ref = cod.pesos_desde_puntos(pre["puntos"])
         act_ref = {c: v for c, v in w_ref.items() if v > 0 and c in sc_a.columns}
         if act_ref:
-            referencias[nom] = nz.puntaje_pilar(sc_a, act_ref).rank(
-                ascending=False, method="min")
+            # Mismo criterio que el ranking principal: sólo compiten los países
+            # con cobertura suficiente en los componentes de ESE índice. Sin
+            # esto, un país sin datos suficientes ocupaba un puesto en la
+            # referencia y corría a todos los de abajo.
+            cob_ref = sc_a[list(act_ref)].notna().mean(axis=1)
+            referencias[nom] = (nz.puntaje_pilar(sc_a, act_ref)
+                                .where(cob_ref >= min_cob)
+                                .rank(ascending=False, method="min"))
     for nom, r_ in referencias.items():
         vivo[f"ref_{nom}"] = r_
 
@@ -828,14 +843,45 @@ def main():
                     f'{t("aviso_sin_dato", L).format(p=", ".join(huerfanos), a=anio)}'
                     f'</div>', unsafe_allow_html=True)
     # Pares con correlación >= umbral_superposicion (los calcula build.py).
-    for sp in f.get("superposiciones", []):
-        if pesos_comp.get(sp["a"], 0) <= 0 or pesos_comp.get(sp["b"], 0) <= 0:
-            continue
-        r = f'{sp["r"]:.2f}'
-        aviso = t("aviso_superposicion", L).format(
-            a=txt(f["componentes"][sp["a"]]["titulo"], L),
-            b=txt(f["componentes"][sp["b"]]["titulo"], L),
-            r=r.replace(".", ",") if L == "es" else r)
+    # Los pares que comparten componentes se juntan en un solo aviso: tres
+    # componentes que miden lo mismo son un grupo, no tres problemas.
+    pares = [sp for sp in f.get("superposiciones", [])
+             if pesos_comp.get(sp["a"], 0) > 0 and pesos_comp.get(sp["b"], 0) > 0]
+    grupos = []
+    for sp in pares:
+        tocados = [g for g in grupos if {sp["a"], sp["b"]} & g["comps"]]
+        nuevo = {"comps": {sp["a"], sp["b"]}, "r": [sp["r"]]}
+        for g in tocados:
+            nuevo["comps"] |= g["comps"]; nuevo["r"] += g["r"]; grupos.remove(g)
+        grupos.append(nuevo)
+
+    def num(x):
+        x = f"{x:.2f}"
+        return x.replace(".", ",") if L == "es" else x
+
+    def y_e(siguiente):
+        """«y» pasa a «e» antes de i- o hi- (salvo hie-, hia-...: «y hielo»)."""
+        if L != "es":
+            return "and"
+        w = siguiente.lstrip("«").lower()
+        return "e" if re.match(r"h?[ií](?![aeiouáéó])", w) else "y"
+
+    for g in grupos:
+        comps = [c for c in claves if c in g["comps"]]
+        titulos = [("«{}»" if L == "es" else "\u201c{}\u201d").format(
+            txt(f["componentes"][c]["titulo"], L)) for c in comps]
+        if len(comps) == 2:
+            b_tit = txt(f["componentes"][comps[1]]["titulo"], L)
+            aviso = t("aviso_superposicion", L).format(
+                a=txt(f["componentes"][comps[0]]["titulo"], L),
+                b=b_tit, y=y_e(b_tit), r=num(g["r"][0]))
+        else:
+            veces = {3: t("veces_3", L), 4: t("veces_4", L)}.get(
+                len(comps), t("veces_n", L).format(n=len(comps)))
+            aviso = t("aviso_superposicion_grupo", L).format(
+                lista=f'{", ".join(titulos[:-1])} {y_e(titulos[-1])} {titulos[-1]}',
+                n={3: t("numero_3", L), 4: t("numero_4", L)}.get(len(comps), len(comps)),
+                rmin=num(min(g["r"])), rmax=num(max(g["r"])), veces=veces)
         izq.markdown(f'<div class="aviso">{aviso}</div>', unsafe_allow_html=True)
 
     # ---------------- pestañas ----------------
@@ -849,21 +895,23 @@ def main():
     with der:
         i1, i2 = st.columns(2)
         for col, cod_l in ((i1, "es"), (i2, "en")):
-            if col.button(cod_l.upper(), use_container_width=True,
+            if col.button(cod_l.upper(), width="stretch",
                           type="primary" if L == cod_l else "secondary",
                           key=f"lang_{cod_l}"):
                 ss.lang = cod_l
                 st.rerun()
-        if st.button(t("critica", L), use_container_width=True):
+        if st.button(t("critica", L), width="stretch",
+                     key="btn_critica"):
             critica(f, L)
         # Destello los primeros 40 segundos: quince ciclos de 2,6 s. Es el
         # botón que hace auditable la página, así que conviene que se note.
         st.markdown('<div class="destello">', unsafe_allow_html=True)
-        if st.button(t("como_funciona", L), use_container_width=True):
+        if st.button(t("como_funciona", L), width="stretch",
+                     key="btn_ayuda"):
             ayuda(datos, puntos, pesos, anio,
                   seguidos[0] if seguidos else "SGP", L)
         st.markdown("</div>", unsafe_allow_html=True)
-        if st.button(t("tut_boton", L), use_container_width=True):
+        if st.button(t("tut_boton", L), width="stretch"):
             ss.tutorial = True
             ss.tut_paso = 0
             ss.tut_notas = {}
@@ -873,7 +921,7 @@ def main():
         st.code(codigo, language=None)
         e = st.text_input("cod", placeholder=t("aplicar_codigo", L),
                           label_visibility="collapsed")
-        if st.button(t("aplicar_codigo", L), use_container_width=True) and e:
+        if st.button(t("aplicar_codigo", L), width="stretch") and e:
             r = cod.decodificar(e, claves_codigo)
             if r:
                 cargar_puntos(r)
@@ -886,7 +934,7 @@ def main():
                           if pd.notna(r.get("ref_heritage")) else None)
                          for i, r in tabla.iterrows()]
             blob = generar(
-                titulo, t("intro_pagina", L).replace("|", ""), filas_pdf,
+                titulo, t("intro_pagina", L).replace("|", "\n\n"), filas_pdf,
                 {"codigo": codigo, "repo": REPO,
                  "fuente": m["fuente"]["publicador"],
                  "corte": m.get("fecha_corte", ""), "anio": anio,
@@ -902,7 +950,7 @@ def main():
             st.download_button(t("imprimir", L), blob,
                                file_name=f"indice_{anio}_{codigo}.pdf",
                                mime="application/pdf",
-                               use_container_width=True)
+                               width="stretch")
         except ImportError:
             pass
 
@@ -996,7 +1044,7 @@ def main():
                                            alt.value(230), alt.value(70)),
                         tooltip=["pais", "indice", "cumplimiento"],
                     ).properties(height=470).interactive(),
-                    use_container_width=True)
+                    width="stretch")
             except ImportError:
                 st.scatter_chart(base_d, x="indice", y="cumplimiento")
 
@@ -1009,33 +1057,30 @@ def ubicar_ventanas():
 
     CSS no sabe dónde quedó cada componente en la pantalla, así que esto lo
     decide un script chico: al pasar el mouse mide la ventana y, si se sale
-    por abajo y arriba hay más lugar, la da vuelta. El script se agrega al
-    documento de la página una sola vez, aunque la app se recalcule.
+    por abajo y arriba hay más lugar, la da vuelta. Se registra una sola vez,
+    aunque la app se recalcule.
     """
-    codigo = """
-    document.addEventListener("mouseover", function (e) {
-      var fila = e.target.closest && e.target.closest(".wrow");
-      if (!fila || !fila.querySelector(".pop")) return;
-      fila.classList.remove("arriba");
-      requestAnimationFrame(function () {
-        var pop = fila.querySelector(".pop").getBoundingClientRect();
-        var r = fila.getBoundingClientRect();
-        var barra = document.querySelector('[data-testid="stSidebar"]');
-        var lim = barra ? barra.getBoundingClientRect()
-                        : {top: 0, bottom: window.innerHeight};
-        var techo = Math.max(lim.top, 0);
-        var piso = Math.min(lim.bottom, window.innerHeight);
-        if (pop.bottom > piso && r.top - techo > piso - r.bottom) {
-          fila.classList.add("arriba");
-        }
+    st.html("""<script>
+    if (!window.ubicarVentanas) {
+      window.ubicarVentanas = true;
+      document.addEventListener("mouseover", function (e) {
+        var fila = e.target.closest && e.target.closest(".wrow");
+        if (!fila || !fila.querySelector(".pop")) return;
+        fila.classList.remove("arriba");
+        requestAnimationFrame(function () {
+          var pop = fila.querySelector(".pop").getBoundingClientRect();
+          var r = fila.getBoundingClientRect();
+          var barra = document.querySelector('[data-testid="stSidebar"]');
+          var lim = barra ? barra.getBoundingClientRect()
+                          : {top: 0, bottom: window.innerHeight};
+          var techo = Math.max(lim.top, 0);
+          var piso = Math.min(lim.bottom, window.innerHeight);
+          if (pop.bottom > piso && r.top - techo > piso - r.bottom) {
+            fila.classList.add("arriba");
+          }
+        });
       });
-    });"""
-    components.html(
-        "<script>var d = window.parent.document;"
-        "if (!d.getElementById('ubicar-ventanas')) {"
-        "var s = d.createElement('script'); s.id = 'ubicar-ventanas';"
-        f"s.textContent = {json.dumps(codigo)}; d.head.appendChild(s);}}"
-        "</script>", height=0)
-
+    }
+    </script>""", unsafe_allow_javascript=True)
 
 ubicar_ventanas()

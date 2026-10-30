@@ -158,13 +158,6 @@ T = {
               "input."},
 
     "titulo_propio": {"es": "Índice propio", "en": "Your own index"},
-    "sub_propio": {
-        "es": "Modificaste la ponderación, así que esto ya no es el índice de "
-              "Heritage. Los datos son los mismos; lo que cambió es cuánto pesa "
-              "cada componente.",
-        "en": "You changed the weighting, so this is no longer the Heritage index. "
-              "The data is the same; what changed is how much each component "
-              "weighs."},
     "volver_heritage": {"es": "Volver a los pesos de Heritage",
                         "en": "Back to Heritage weights"},
     "ver_componentes": {"es": "Ver los {n} componentes",
@@ -395,7 +388,7 @@ T = {
               "component name in the left panel to see the ranking as if that "
               "component weighed 100 and the rest zero."},
     "aviso_superposicion": {
-        "es": "«{a}» y «{b}» tienen una correlación de {r}: miden casi lo "
+        "es": "«{a}» {y} «{b}» tienen una correlación de {r}: miden casi lo "
               "mismo. Con los dos activos, esa dimensión pesa el doble sin que "
               "el porcentaje lo diga: es el mismo problema de doble conteo que "
               "este proyecto le señala a los índices compuestos.",
@@ -404,60 +397,71 @@ T = {
               "dimension weighs twice without the percentage saying so: the "
               "same double-counting problem this project points out in "
               "composite indices."},
+    "aviso_superposicion_grupo": {
+        "es": "{lista} tienen correlaciones entre {rmin} y {rmax}: miden casi "
+              "lo mismo. Con los {n} activos, esa dimensión pesa {veces} sin "
+              "que el porcentaje lo diga: es el mismo problema de doble conteo "
+              "que este proyecto le señala a los índices compuestos.",
+        "en": "{lista} have correlations between {rmin} and {rmax}: they "
+              "measure almost the same thing. With all {n} active, that "
+              "dimension weighs {veces} without the percentage saying so: the "
+              "same double-counting problem this project points out in "
+              "composite indices."},
+    "numero_3": {"es": "tres", "en": "three"},
+    "numero_4": {"es": "cuatro", "en": "four"},
+    "veces_3": {"es": "el triple", "en": "three times as much"},
+    "veces_4": {"es": "el cuádruple", "en": "four times as much"},
+    "veces_n": {"es": "{n} veces más", "en": "{n} times as much"},
     "critica": {"es": "Razones para un nuevo índice",
                 "en": "Reasons for a new index"},
     "crit_p0": {"es": "Por qué otro índice", "en": "Why another index"},
     "crit_porque": {
-        "es": "Ningún índice compuesto es neutral. Promediar doce o trece "
-              "números distintos obliga a decidir cuáles entran, cuánto pesa "
-              "cada uno y qué se hace con lo que no se puede medir. **Este "
-              "índice también toma esas decisiones**, y por eso están todas a "
-              "la vista: los pesos se editan en pantalla, el código de "
-              "configuración permite reproducir cualquier ponderación, y el "
-              "cálculo de cada país se muestra paso a paso.\n\n"
-              "No pretende ser perfecto. Pretende ser **mejor en cuatro cosas "
-              "concretas** que el índice del que parte.\n\n"
-              "**1. Sólo entra lo que mide reglas.** Quedan fuera los cinco "
-              "componentes de Heritage que miden otra cosa: integridad del "
-              "gobierno y las libertades de inversión y financiera, que son "
-              "evaluaciones cualitativas sin insumo verificable; libertad de "
-              "empresa, donde tres de sus cuatro subfactores son consecuencias "
-              "del desarrollo; y libertad laboral, cuya fórmula compara contra "
-              "el promedio mundial y produce resultados que no se sostienen.\n\n"
-              "**2. Se mide lo que el Estado posee, no sólo lo que gasta.**[4] "
+        "es": "Ningún índice compuesto es neutral: promediar varios números "
+              "distintos obliga a decidir cuáles entran, cuánto pesa cada uno "
+              "y qué se hace con lo que no se puede medir. Este índice también "
+              "toma esas decisiones y por eso están todas a la vista: los pesos "
+              "se editan en pantalla, el código de configuración permite "
+              "reproducir cualquier ponderación, y el cálculo de cada país se "
+              "muestra paso a paso.\n\n"
+              "Sólo entra lo que mide el tamaño y la intervención del Estado. "
+              "Cuánto recauda, cuánto gasta y consume, cuánto posee e invierte, "
+              "y cuánto restringe el comercio, el crédito, los capitales y la "
+              "entrada a los mercados. Quedan fuera los componentes de Heritage "
+              "que miden otra cosa: la calidad de las instituciones (derechos "
+              "de propiedad, efectividad judicial, integridad del gobierno), "
+              "resultados macroeconómicos (salud fiscal, libertad monetaria), y "
+              "evaluaciones cualitativas o consecuencias del desarrollo "
+              "(libertades de inversión, financiera, de empresa y laboral) ya "
+              "que estos componentes no son valores particulares del "
+              "Liberalismo económico.\n\n"
+              "Además, se mide lo que el Estado posee, no sólo lo que gasta.[4] "
               "Heritage no tiene ningún componente que mida propiedad estatal "
               "de la economía, inversión pública, control del crédito ni "
-              "controles de capital. Los cuatro entran acá, con datos "
-              "publicados por el Fraser Institute, una organización del mismo "
-              "campo ideológico[5].\n\n"
-              "**3. Ninguna dimensión se cuenta dos veces.** Se midió la "
-              "correlación entre todos los pares de componentes y se "
-              "descartaron los que superaban 0,7 con otro ya incluido. En "
-              "Heritage, sus tres componentes de Estado de derecho "
-              "correlacionan entre 0,91 y 0,93: pesan 25% pero funcionan como "
-              "una sola dimensión.\n\n"
-              "**4. Todo se puede rehacer.**[6] Los datos son públicos y sin "
-              "modificar, el código está abierto, y la réplica del índice "
-              "original se valida en cada compilación contra el puntaje que "
-              "Heritage publica.\n\n"
-              "Lo que **no** resuelve: sigue dependiendo de componentes cuyos "
-              "subfactores nadie publica, sigue siendo un promedio que permite "
-              "compensar una dimensión mala con otra buena, y sigue sin medir "
-              "la coerción que no ejerce el Estado.",
-        "en": "No composite index is neutral. Averaging twelve or thirteen "
-              "different numbers forces decisions about what enters, how much "
-              "each weighs and what to do with what cannot be measured. **This "
-              "index makes those decisions too**, which is why they are all "
-              "visible.\n\n"
-              "It does not claim to be perfect. It claims to be **better in "
-              "four concrete ways** than the index it starts from: only "
-              "rule-measuring components enter; what the state owns is measured, "
-              "not only what it spends; no dimension is counted twice; and "
-              "everything can be redone from public data and open code.\n\n"
-              "What it does **not** solve: it still depends on components whose "
-              "sub-factors nobody publishes, it is still an average that lets "
-              "one dimension offset another, and it still does not measure "
-              "coercion not exercised by the state."},
+              "controles de capital. Los cuatro entran acá, con datos del "
+              "Fraser Institute.",
+        "en": "No composite index is neutral: averaging several different "
+              "numbers forces decisions about what enters, how much each weighs "
+              "and what to do with what cannot be measured. This index makes "
+              "those decisions too, which is why they are all visible: weights "
+              "are edited on screen, the configuration code reproduces any "
+              "weighting, and each country's calculation is shown step by "
+              "step.\n\n"
+              "Only what measures the size and intervention of the state "
+              "enters. How much it collects, how much it spends and consumes, "
+              "how much it owns and invests, and how much it restricts trade, "
+              "credit, capital and market entry. Heritage components that "
+              "measure something else are left out: the quality of "
+              "institutions (property rights, judicial effectiveness, "
+              "government integrity), macroeconomic outcomes (fiscal health, "
+              "monetary freedom), and qualitative assessments or consequences "
+              "of development (investment, financial, business and labor "
+              "freedom), since these components are not values specific to "
+              "economic liberalism.\n\n"
+              "In addition, what the state owns is measured, not only what it "
+              "spends.[4] Heritage has no component measuring state ownership "
+              "of the economy, government investment, credit control or "
+              "capital controls. All four enter here, with data from the "
+              "Fraser Institute."},
     "crit_p1": {"es": "Lo que declaran y lo que calculan",
                 "en": "What they declare and what they compute"},
     "crit_p2": {"es": "Casos que no cierran", "en": "Cases that do not add up"},
@@ -615,8 +619,6 @@ T = {
                           "en": "Definition of economic freedom"},
     "fuente_fraser": {"es": "Fraser Institute, Economic Freedom of the World",
                       "en": "Fraser Institute, Economic Freedom of the World"},
-    "fuente_vdem": {"es": "V-Dem, base de datos país-año",
-                    "en": "V-Dem, country-year dataset"},
     "fuente_repo": {"es": "Código y datos de esta página",
                     "en": "Code and data of this page"},
     "ayuda_p0": {"es": "Qué mide cada componente",
@@ -652,28 +654,31 @@ T = {
     "calc_peso": {"es": "Peso", "en": "Weight"},
     "calc_puntaje": {"es": "Puntaje", "en": "Score"},
     "intro_pagina": {
-        "es": "La palabra «libertad» está en disputa y los índices que dicen "
-              "medirla toman decisiones que casi nunca se ven"
+        "es": "Esta página busca contribuir a diferenciar dos términos: "
+              "«libertad» y «Liberalismo económico». El primero es disputado "
+              "por ideologías políticas diversas; el segundo designa una "
+              "ideología concreta, la que defiende un Estado mínimo."
               "|"
-              ". Esta página pretende resolver este problema. "
-              "Primero reconstruye el Index of Economic Freedom de The "
-              "Heritage Foundation con sus propios datos y muestra dónde su "
-              "cálculo se aparta de su propia definición: qué mide, qué no "
-              "mide, y qué pasa con el ranking cuando se cambian los pesos. "
-              "Esto nos permite armar un nuevo índice que presentamos como "
-              "«Índice de Liberalismo económico» y que puede ser "
-              "escrutado en detalle.",
-        "en": "The word \u201cfreedom\u201d is contested, and the indices that "
-              "claim to measure it make decisions that are rarely visible"
+              "Para esto, primero reconstruimos el Index of Economic Freedom "
+              "de The Heritage Foundation con sus propios datos y mostramos "
+              "dónde su cálculo se aparta de su propia definición: qué mide, "
+              "qué no mide, y qué pasa con el ranking cuando se cambian los "
+              "pesos. Esto nos permite armar un nuevo índice que presentamos "
+              "como «Índice de Liberalismo económico» que puede ser escrutado "
+              "en detalle.",
+        "en": "This page seeks to help distinguish two terms: "
+              "\u201cfreedom\u201d and \u201ceconomic liberalism\u201d. The "
+              "first is contested by diverse political ideologies; the second "
+              "names a specific ideology, the one that advocates a minimal "
+              "state."
               "|"
-              ". This page sets out to address that. "
-              "It first reconstructs The Heritage Foundation's Index of "
-              "Economic Freedom from its own data and shows where its "
+              "To that end, we first reconstruct The Heritage Foundation's "
+              "Index of Economic Freedom from its own data and show where its "
               "computation departs from its own definition: what it measures, "
               "what it does not, and what happens to the ranking when the "
-              "weights change. That allows us to build a new index, presented "
-              "here as the \u201cEconomic Liberalism Index\u201d, which "
-              "can be scrutinized in detail.",
+              "weights change. This allows us to build a new index, presented "
+              "as the \u201cEconomic Liberalism Index\u201d, which can be "
+              "scrutinized in detail.",
     },
     "volver_defecto": {"es": "Volver al índice por defecto",
                        "en": "Back to the default index"},

@@ -3,7 +3,7 @@
 No verifica el aspecto visual, pero atrapa NameError, KeyError y errores de
 logica antes de levantar el servidor, que es exactamente lo que se nos escapo.
 """
-import sys, types
+import re, sys, types
 from pathlib import Path
 sys.path.insert(0, "src")
 
@@ -38,7 +38,7 @@ class ST(types.ModuleType):
     def form(self, *a, **k): return Col()
     def container(self, *a, **k): return Col()
     def expander(self, *a, **k): return Col()
-    def number_input(self, label, mn=0, mx=100, val=0, step=1, **k): return int(val)
+    def number_input(self, label, mn=0, mx=100, val=0, step=1, **k): return int(k.get("value", val))
     def slider(self, label, mn=0, mx=10, val=5, step=1, **k): return val
     def selectbox(self, label, opciones, index=0, **k):
         return list(opciones)[index] if len(opciones) else None
@@ -51,11 +51,6 @@ class ST(types.ModuleType):
     def __getattr__(self, nombre): return lambda *a, **k: None
 
 st = ST("streamlit"); sys.modules["streamlit"] = st
-# components.html (script de la ventana de definición): no hace nada acá.
-v1 = types.ModuleType("streamlit.components.v1"); v1.html = lambda *a, **k: None
-comp = types.ModuleType("streamlit.components"); comp.v1 = v1
-ST.components = comp
-sys.modules.update({"streamlit.components": comp, "streamlit.components.v1": v1})
 ruta = Path("app/streamlit_app.py")
 src = ruta.read_text().replace("\nmain()\n", "\n")
 ns = {"__name__": "app", "__file__": str(ruta.resolve())}
@@ -85,8 +80,15 @@ import codigo as cod
 claves_cod = f0["orden_codigo"]
 viejas = claves_cod[2:]                    # las 18 claves anteriores a OCDE y FMI
 mezcla = {c: 5 * (i % 4) for i, c in enumerate(viejas)}
+# Configuración del índice propio hasta octubre de 2026 (13 componentes).
+LIBERALISMO_2026_10 = {c: 10 for c in (
+    "hf_property_rights", "hf_judicial_effectiveness", "hf_tax_burden",
+    "hf_government_spending", "hf_fiscal_health", "hf_monetary_freedom",
+    "hf_trade_freedom", "z_propiedad_estatal", "z_inversion_publica",
+    "z_controles_capital", "z_regulacion_credito", "z_consumo_publico",
+    "z_entrada_mercados")}
 for viejo, esperado in [("HF-I7ZY0", f0["presets"]["heritage"]["puntos"]),
-                        ("HF-I6WSZ", f0["presets"]["liberalismo"]["puntos"]),
+                        ("HF-I6WSZ", LIBERALISMO_2026_10),
                         ("HF-P0001-AQE4-GRPJ-AVGS-WS", mezcla)]:
     leido = cod.decodificar(viejo, claves_cod)
     assert leido and all(leido[k] == esperado.get(k, 0) for k in claves_cod), viejo
@@ -105,4 +107,29 @@ print("  aviso de superposición OK")
 assert any('class="pop"' in x and "Gasto total del gobierno general" in x for x in salida), \
     "no apareció la definición en la ventana emergente"
 print("  ventana con la definición OK")
+
+# Con un preset activo, su propia columna de referencia no puede mostrar
+# movimientos: es el mismo ranking.
+for nombre in f0["presets"]:
+    salida.clear()
+    ST.session_state = Estado({**BASE, "puntos": dict(f0["presets"][nombre]["puntos"])})
+    ns["ss"] = ST.session_state
+    ns["main"]()
+    tabla = "".join(salida)
+    filas = [x for x in tabla.split('<div class="fila') if 'class="pos"' in x]
+    orden = [n for n in ("liberalismo", "heritage") if n in f0["presets"]]
+    propia = [re.findall(r'<div class="vs">(.*?)</div>', x)[orden.index(nombre)] for x in filas]
+    assert filas and not any("▲" in c or "▼" in c for c in propia), \
+        f"la columna {nombre} muestra movimientos contra sí misma"
+print("  referencias sin movimientos contra sí mismas OK")
+
+# Con Heritage, sus tres componentes de Estado de derecho forman un solo
+# grupo superpuesto: un aviso, no tres.
+salida.clear()
+ST.session_state = Estado({**BASE, "puntos": dict(f0["presets"]["heritage"]["puntos"])})
+ns["ss"] = ST.session_state
+ns["main"]()
+avisos = [x for x in salida if "miden casi" in x]
+assert len(avisos) == 1 and "el triple" in avisos[0] and " e «Integridad" in avisos[0], avisos
+print("  avisos de superposición agrupados OK")
 print("prueba de humo superada")
