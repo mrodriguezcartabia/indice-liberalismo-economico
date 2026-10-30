@@ -67,7 +67,7 @@ def cargar_config(path: Path) -> dict:
 
 
 def series_del_config(cfg: dict) -> set[str]:
-    """Todas las series que este índice usa, incluidas las sólo reportadas."""
+    """Todas las series que este índice usa, incluidas las solo reportadas."""
     s = {v.get("serie", k) for k, v in cfg["componentes"].items()}
     s |= set((cfg.get("solo_reportadas") or {}).keys())
     for c in (cfg.get("eje_cumplimiento") or {}).get("componentes", []):
@@ -110,30 +110,49 @@ def construir(cfg: dict, panel: pd.DataFrame) -> dict:
     idx = ["iso3", "anio"]
     # --- alinear series rezagadas al año del vintage ------------------------
     # Una fuente puede terminar antes que el índice (Fraser llega a 2024 y
-    # Heritage a 2026). En ese caso se usa la última observación disponible y
-    # se declara de qué año es. No es imputación: es un dato real con su fecha
-    # a la vista. El propio Heritage trabaja con datos rezagados respecto de su
-    # edición.
+    # Heritage a 2026). Para cada año del índice (cada edición de Heritage
+    # cargada) y cada país sin dato de ese año se usa su última observación
+    # hasta ese año, siempre que no tenga más de `antiguedad_maxima` años:
+    # un dato más viejo no describe al país de hoy, y el país queda sin dato en
+    # ese componente. No es imputación: es un dato real con su año declarado.
     rezagos = {}
     vintage = int(cfg["meta"]["vintage"])
+    antig = int(cfg["meta"].get("antiguedad_maxima", 10))
+    anios_indice = range(int(cfg["meta"].get("ediciones_desde", vintage)), vintage + 1)
+    original = panel           # se busca siempre entre los datos reales, no entre los ya alineados
     for nombre, spec in comps.items():
         if not spec.get("alinear_al_vintage"):
             continue
         serie = spec.get("serie", nombre)
-        sub = panel[panel["serie"] == serie]
-        if sub.empty or vintage in sub["anio"].values:
-            continue
-        ult = sub.sort_values("anio").groupby("iso3", as_index=False).last()
-        rezagos[nombre] = {
-            "anio_dato": int(ult["anio"].max()),
-            "anio_asignado": vintage,
-            "paises": int(len(ult)),
-        }
-        ult["anio"] = vintage
-        panel = pd.concat([panel, ult[["iso3", "serie", "anio", "valor"]]],
-                          ignore_index=True)
-        print(f"  · {nombre}: último dato {rezagos[nombre]['anio_dato']} "
-              f"alineado a {vintage} ({len(ult)} países)")
+        for anio in anios_indice:
+            sub = original[original["serie"] == serie]
+            if sub.empty:
+                break
+            desde = anio - antig
+            # País por país: si un solo país tuviera dato de ese año, los
+            # demás igual tienen que alinearse.
+            tienen = set(sub.loc[sub["anio"] == anio, "iso3"])
+            previos = sub[(sub["anio"] < anio) & ~sub["iso3"].isin(tienen)]
+            recientes = previos[previos["anio"] >= desde]
+            if recientes.empty:
+                continue
+            ult = recientes.sort_values("anio").groupby("iso3", as_index=False).last()
+            viejos = sorted(set(previos["iso3"]) - set(ult["iso3"]))
+            if anio == vintage:          # lo que se declara en la app
+                rezagos[nombre] = {
+                    "anio_dato": int(ult["anio"].max()),
+                    "anio_asignado": vintage,
+                    "paises": int(len(ult)),
+                    "desde": desde,
+                    "descartados": viejos,
+                }
+                print(f"  · {nombre}: último dato {int(ult['anio'].max())} "
+                      f"alineado a {vintage} ({len(ult)} países"
+                      + (f"; sin dato desde {desde}: {', '.join(viejos)}" if viejos else "")
+                      + ")")
+            ult["anio"] = anio
+            panel = pd.concat([panel, ult[["iso3", "serie", "anio", "valor"]]],
+                              ignore_index=True)
 
     ancho = panel.pivot_table(index=idx, columns="serie", values="valor",
                               aggfunc="last")
@@ -188,13 +207,13 @@ def construir(cfg: dict, panel: pd.DataFrame) -> dict:
 
     ind = pd.DataFrame(index=scores.index)
     ind["indice"] = nz.puntaje_pilar(scores, pesos_comp)
-    # La cobertura se mide sólo sobre los componentes que pesan: un país no
+    # La cobertura se mide solo sobre los componentes que pesan: un país no
     # debe quedar fuera del ranking por no tener un dato que el índice no usa.
     con_peso = [n for n, sp in comps.items() if sp.get("puntos", 0) > 0]
     ind["cobertura"] = nz.cobertura(scores, con_peso or list(comps))
     ind = ind.join(pilares)
 
-    # --- eje del gráfico de dispersión, fuera del puntaje ------------------
+    # --- Estado de derecho, aparte y fuera del puntaje --------------------
     eje = cfg.get("eje_cumplimiento")
     if eje:
         partes, pesos = [], []
@@ -215,13 +234,12 @@ def construir(cfg: dict, panel: pd.DataFrame) -> dict:
     ind["publicable"] = ind["cobertura"] >= cfg["meta"]["cobertura_minima"]
     ind = ind.reset_index()
     ind["ranking"] = (ind.where(ind["publicable"])
+                        .assign(indice=lambda d: d["indice"].round(9))
                         .groupby("anio")["indice"]
                         .rank(ascending=False, method="min"))
 
     # --- validación contra el puntaje publicado, si existe -----------------
     validacion = {"disponible": False}
-    ref = next((s.get("columna") or s.get("serie")
-                for s in (cfg.get("solo_reportadas") or {}).values()), None)
     ref_serie = next(iter((cfg.get("solo_reportadas") or {}).keys()), None)
     if ref_serie and ref_serie in ancho.columns:
         cmp_ = ind.set_index(idx).join(ancho[[ref_serie]]).dropna(

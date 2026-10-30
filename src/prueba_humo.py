@@ -38,9 +38,14 @@ class ST(types.ModuleType):
     def form(self, *a, **k): return Col()
     def container(self, *a, **k): return Col()
     def expander(self, *a, **k): return Col()
-    def number_input(self, label, mn=0, mx=100, val=0, step=1, **k): return int(k.get("value", val))
+    def number_input(self, label, mn=0, mx=100, val=0, step=1, **k):
+        if "key" in k and k["key"] in ST.session_state:   # widget con clave
+            return int(ST.session_state[k["key"]])
+        return int(k.get("value", val))
     def slider(self, label, mn=0, mx=10, val=5, step=1, **k): return val
     def selectbox(self, label, opciones, index=0, **k):
+        if "key" in k and k["key"] in ST.session_state:     # widget con clave
+            return ST.session_state[k["key"]]
         return list(opciones)[index] if len(opciones) else None
     def multiselect(self, label, opciones, default=None, **k): return default or []
     def text_input(self, *a, **k): return ""
@@ -57,7 +62,7 @@ ns = {"__name__": "app", "__file__": str(ruta.resolve())}
 exec(compile(src, str(ruta), "exec"), ns)
 
 BASE = {"lang": "es", "puntos": None, "tutorial": False, "ver": 0,
-        "tut_paso": 0, "tut_notas": {}, "esc": False}
+        "tut_paso": 0, "tut_notas": {}}
 f0 = ns["cargar"]()["f"]
 Z = f0["presets"]["liberalismo"]["puntos"]
 
@@ -123,13 +128,54 @@ for nombre in f0["presets"]:
         f"la columna {nombre} muestra movimientos contra sí misma"
 print("  referencias sin movimientos contra sí mismas OK")
 
-# Con Heritage, sus tres componentes de Estado de derecho forman un solo
-# grupo superpuesto: un aviso, no tres.
+# Con Heritage, los componentes de Estado de derecho que superan el umbral
+# de superposición salen en un solo aviso, no en uno por par.
 salida.clear()
 ST.session_state = Estado({**BASE, "puntos": dict(f0["presets"]["heritage"]["puntos"])})
 ns["ss"] = ST.session_state
 ns["main"]()
 avisos = [x for x in salida if "miden casi" in x]
-assert len(avisos) == 1 and "el triple" in avisos[0] and " e «Integridad" in avisos[0], avisos
+assert len(avisos) == 1 and " e «Integridad" in avisos[0], avisos
 print("  avisos de superposición agrupados OK")
+
+# Con todos los datos, el largo de la barra (suma de los tramos) es el puntaje.
+# Con alguno faltante (Haití no tiene presión fiscal, y aparece bajando la
+# cobertura a 90), la barra es más corta y el nombre lleva asterisco.
+salida.clear()
+ST.session_state = Estado({**BASE, "sel_cob": 90,
+                           "puntos": dict(f0["presets"]["liberalismo"]["puntos"])})
+ns["ss"] = ST.session_state
+ns["main"]()
+html_ = "".join(salida)
+vistos = 0
+for x in html_.split('<div class="fila')[1:]:
+    largo = sum(float(w) for w in re.findall(r'class="seg"[^>]*style="width:([\d.]+)%', x))
+    puntaje = re.search(r'<div class="val">([\d.,]+)</div>', x)
+    pais = re.search(r'<div class="pais">([^<]+)</div>', x).group(1)
+    if not puntaje:
+        continue
+    if pais.endswith("*"):
+        vistos += 1
+        assert largo < float(puntaje.group(1).replace(',', '.')) - 1, (pais, largo, puntaje.group(1))
+    else:
+        assert abs(largo - float(puntaje.group(1).replace(',', '.'))) < 0.06, (pais, largo, puntaje.group(1))
+assert vistos and "Haití*" in html_ and "Sin dato, o con un dato de más de diez años" in html_, vistos
+print("  barras y asteriscos de datos faltantes OK")
+
+# Con Heritage activo, los países cuyo puesto difiere del que surge del puntaje
+# publicado llevan doble asterisco y una nota que lo explica.
+salida.clear()
+ST.session_state = Estado({**BASE, "sel_cuantos": 60,
+                           "puntos": dict(f0["presets"]["heritage"]["puntos"])})
+ns["ss"] = ST.session_state
+ns["main"]()
+html_ = "".join(salida)
+assert re.search(r'class="pais">[^<]+\*\*<', html_) and "** Puesto distinto" in html_
+print("  doble asterisco de puestos de Heritage OK")
+
+# Cada barra trae un tramo por componente con dato, también los de peso cero:
+# si no, pasar el mouse por uno de ellos deja las barras vacías.
+f_ = [x for x in html_.split('<div class="fila')[1:] if 'class="pos"' in x][0]
+assert 'data-c="ocde_presion_fiscal"' in f_, "falta el tramo de un componente con peso cero"
+print("  tramos de componentes con peso cero OK")
 print("prueba de humo superada")

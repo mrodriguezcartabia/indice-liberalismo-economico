@@ -1,21 +1,21 @@
 componente,titulo_es,observados
-hf_property_rights,Derechos de propiedad,184
-hf_judicial_effectiveness,Efectividad judicial,184
-hf_government_integrity,Integridad del gobierno,184
-hf_tax_burden,Carga tributaria,184
-hf_government_spending,Gasto público,178
-hf_fiscal_health,Salud fiscal,180
-hf_business_freedom,Libertad de empresa,184
-hf_labor_freedom,Libertad laboral,184
-hf_monetary_freedom,Libertad monetaria,182
-hf_trade_freedom,Libertad comercial,177
-hf_investment_freedom,Libertad de inversión,177
-hf_financial_freedom,Libertad financiera,177
-z_propiedad_estatal,Propiedad estatal de la economía,5104
-z_inversion_publica,Inversión pública,4723
-z_controles_capital,Controles de capital,4585
-z_regulacion_credito,Regulación del crédito,5024
-z_consumo_publico,Consumo público,4800
-ocde_presion_fiscal,Presión fiscal,4048
-fmi_gasto_publico,Gasto público (FMI),6720
-z_entrada_mercados,Libertad de entrada a mercados,4290
+hf_property_rights,Derechos de propiedad,1278
+hf_judicial_effectiveness,Efectividad judicial,1278
+hf_government_integrity,Integridad del gobierno,1278
+hf_tax_burden,Carga tributaria,1248
+hf_government_spending,Gasto público,1247
+hf_fiscal_health,Salud fiscal,1248
+hf_business_freedom,Libertad de empresa,1264
+hf_labor_freedom,Libertad laboral,1261
+hf_monetary_freedom,Libertad monetaria,1255
+hf_trade_freedom,Libertad comercial,1249
+hf_investment_freedom,Libertad de inversión,1250
+hf_financial_freedom,Libertad financiera,1245
+z_propiedad_estatal,Propiedad estatal de la economía,5266
+z_inversion_publica,Inversión pública,4884
+z_controles_capital,Controles de capital,4748
+z_regulacion_credito,Regulación del crédito,5188
+z_consumo_publico,Consumo público,4965
+ocde_presion_fiscal,Presión fiscal,4205
+fmi_gasto_publico,Gasto público (FMI),6790
+z_entrada_mercados,Libertad de entrada a mercados,4455

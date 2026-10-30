@@ -3,16 +3,18 @@
     streamlit run app/streamlit_app.py
 
 Diseño:
-  - barra lateral -> texto introductorio, los componentes en puntos, y el
-    código de configuración abajo. Es lo que define QUÉ ES el índice.
-  - pantalla principal -> selector de ponderación, controles de vista en
-    horizontal, ranking, árbol de indicadores, dispersión.
-  - cualquier cambio de puntos convierte "Heritage" en "Índice propio".
+  - barra lateral -> texto introductorio y los componentes en puntos, con su
+    definición al pasar el mouse. Es lo que define qué es el índice.
+  - pantalla principal -> selector de índice, controles de vista en
+    horizontal y ranking.
+  - columna derecha -> idioma, razones, cómo funciona, tutorial, código de
+    configuración y PDF.
+  - cualquier cambio de puntos convierte el índice activo en "Índice propio".
 
 Los pesos se asignan en PUNTOS por componente, no en porcentajes. El peso de un
 componente es sus puntos sobre el total, y el de un pilar es la suma de los
 puntos de sus componentes: no se pondera aparte. Esa es la mecánica del índice
-original, y dejarla a la vista es parte de lo que la página muestra.
+de Heritage, y dejarla a la vista es parte de lo que la página muestra.
 
 La app no descarga ni recalcula desde las fuentes: lee los vintages congelados
 que produce src/build.py.
@@ -37,28 +39,30 @@ import normalize as nz         # noqa: E402
 from countries import nombre   # noqa: E402
 from i18n import t, txt        # noqa: E402
 
-st.set_page_config(page_title="Índice de libertad económica", layout="wide",
-                   initial_sidebar_state="expanded")
+st.set_page_config(page_title=t("titulo_pestana", st.session_state.get("lang", "es")),
+                   layout="wide", initial_sidebar_state="expanded")
 
 # ---------------------------------------------------------------------------
 # IMPORTANTE: sin líneas en blanco ni comentarios CSS. Streamlit divide el
 # markdown en cada línea vacía, cierra el <style> por su cuenta y el resto se
 # imprime como texto. Por eso además se usa st.html().
+# Las ventanas del "?" (stTooltipContent) solo cambian de color: Streamlit
+# calcula su tamaño, y cambiarles letra, márgenes o alto desarma el recuadro.
 # ---------------------------------------------------------------------------
 CSS = """<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--fondo:#322C48;--panel:#3C3557;--panel2:#453D63;--tinta:#F0EDF6;
---tenue:#B8B0CC;--gris-pop:#575463;--amarillo:#D9B868;--violeta:#9A82C9;--violeta2:#5F4E8A;
---alerta:#D98070;--linea:#4A4368;}
+:root{--fondo:#2E2C36;--panel:#383641;--panel2:#42404C;--tinta:#F0EDF6;
+--tenue:#BAB6C6;--gris-pop:#55525F;--acento:#D3C5FF;--sobre-acento:#2A2440;--violeta:#9A8DBF;
+--violeta2:#5A566B;--alerta:#E39A8C;--linea:#47444F;--pista:#211F28;}
 .stApp{background:var(--fondo);}
 html,body,[class*="css"]{font-family:'Archivo',system-ui,sans-serif;
 color:var(--tinta);font-size:16px;line-height:1.62;}
 h1,h2,h3,h4{font-family:'Archivo',sans-serif;font-weight:800;letter-spacing:-.02em;color:var(--tinta);}
 h1{font-size:2.1rem;line-height:1.05;margin:.1rem 0 .3rem;}
-h1 em{font-style:normal;color:var(--amarillo);}
+h1 em{font-style:normal;color:var(--acento);}
 .bajada{color:var(--tinta);font-size:.98rem;line-height:1.65;opacity:.9;}
-.bajada .mas{color:var(--amarillo);font-weight:600;}
+.bajada .mas{color:var(--acento);font-weight:600;}
 .cab{display:grid;grid-template-columns:2.5rem 10.5rem 1fr 4rem 3.6rem 3.6rem;gap:.5rem;
 white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
 color:var(--tenue);
@@ -67,50 +71,70 @@ padding-bottom:.35rem;border-bottom:1px solid var(--violeta2);}
 align-items:center;padding:.26rem 0;border-bottom:1px solid var(--linea);}
 .pos,.val,.vs{font-family:'IBM Plex Mono',monospace;font-size:.86rem;}
 .pos{color:var(--tenue);font-weight:600;}
-.val{text-align:right;font-weight:600;color:var(--amarillo);}
+.val{text-align:right;font-weight:600;color:var(--acento);}
 .vs{text-align:right;color:var(--tenue);font-size:.76rem;}
 .pais{font-size:.92rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.barra{display:flex;height:14px;background:#4A4368;border-radius:2px;overflow:hidden;}
-.seg{height:100%;transition:width .28s cubic-bezier(.4,0,.2,1);min-width:0;}
-.sube{color:var(--amarillo);font-weight:600;}
+.barra{display:flex;height:14px;background:var(--pista);border-radius:2px;}
+.seg{height:100%;transition:width .28s cubic-bezier(.4,0,.2,1);min-width:0;position:relative;}
+.seg:first-child{border-radius:2px 0 0 2px;}
+.seg .segpop{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);
+white-space:nowrap;z-index:1000;padding:.3rem .55rem;border-radius:4px;background:var(--gris-pop);
+border:1px solid var(--linea);color:var(--tinta);font-family:'Archivo',system-ui,sans-serif;
+font-size:.76rem;line-height:1.38;box-shadow:0 6px 18px rgba(0,0,0,.35);pointer-events:none;}
+.seg:hover .segpop{display:block;}
+.sube{color:var(--acento);font-weight:600;}
 .baja{color:var(--alerta);font-weight:600;}
 .seguido{background:rgba(154,130,201,.15);margin:0 -.4rem;padding:.26rem .4rem;border-radius:3px;}
-.seguido .pais{color:var(--amarillo);}
+.seguido .pais{color:var(--acento);}
 .corte{font-family:'IBM Plex Mono',monospace;font-size:.7rem;
 color:var(--tenue);margin:1rem 0 .3rem;}
 .nota{font-size:.86rem;color:var(--tinta);opacity:.85;
 border-left:2px solid var(--violeta);padding-left:.75rem;margin:.6rem 0;
 line-height:1.6;}
-.aviso{font-size:.79rem;color:var(--alerta);border-left:2px solid var(--alerta);
+.aviso{font-size:.9rem;color:var(--alerta);border-left:2px solid var(--alerta);
 padding-left:.75rem;margin:.6rem 0;line-height:1.5;}
 .paso{font-family:'IBM Plex Mono',monospace;font-size:.8rem;padding:.3rem 0;
 border-bottom:1px dotted var(--linea);color:var(--tinta);}
 .etq{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
 padding:.1rem .45rem;border-radius:3px;
 border:1px solid var(--linea);color:var(--tenue);}
-.etq.ok{border-color:var(--amarillo);color:var(--amarillo);}
+.etq.ok{border-color:var(--acento);color:var(--acento);}
 .etq.no{border-color:var(--alerta);color:var(--alerta);}
 .chip{width:9px;height:9px;border-radius:2px;display:inline-block;
 margin-right:.4rem;flex:0 0 auto;}
 .wrow{font-size:.86rem;cursor:default;border-radius:3px;padding:.15rem .3rem;
 margin:0 -.3rem;transition:background .15s;position:relative;}
-.wrow:hover{background:rgba(217,184,104,.13);}
+.wrow:hover{background:rgba(211,197,255,.14);}
 .wrow .pop{display:none;position:absolute;left:0;top:100%;z-index:1000;width:100%;
 min-width:12rem;margin-top:.25rem;padding:.45rem .6rem;border-radius:4px;
 background:var(--gris-pop);border:1px solid var(--linea);color:var(--tinta);
 font-size:.76rem;line-height:1.38;box-shadow:0 6px 18px rgba(0,0,0,.35);
 pointer-events:none;}
 .wrow:hover .pop{display:block;}
+.wrow .pop100{display:block;margin-top:.35rem;color:var(--acento);}
+[data-testid="stNumberInputStepUp"],[data-testid="stNumberInputStepDown"]{display:none !important;}
+@media (min-width:640px){
+[data-testid="stColumn"]:has(.marca-der){flex:0 0 max-content !important;width:max-content !important;max-width:none !important;}
+[data-testid="stColumn"]:has(.marca-der) [data-testid="stElementContainer"]:not(:has(button)){width:0 !important;min-width:100% !important;}
+[data-testid="stColumn"]:has(.marca-der) button p{white-space:nowrap;}
+[data-testid="stHorizontalBlock"]:has(.marca-der) > [data-testid="stColumn"]:not(:has(.marca-der)){flex:1 1 0 !important;min-width:0 !important;width:auto !important;}
+}
+[data-testid="stDialog"] :is([data-testid="stCaptionContainer"],[data-testid="stCaptionContainer"] *,.nota,.sfn,.sfpeso,.refrow,.refnum,.etq,.tabcab,.tabcab *,.tabnum,.pil,.pil *,[data-testid="stMetricLabel"] *,[data-baseweb="tab"] p,[data-testid="stExpander"] summary *,[data-testid="stWidgetLabel"] *,[data-testid="stTable"] *,[data-testid="stProgress"] *,[data-testid="stAlertContentInfo"] *,[data-testid="stAlertContentWarning"] *,small){font-size:1rem !important;}
+[data-testid="stTooltipContent"]{background-color:var(--gris-pop) !important;color:var(--tinta) !important;
+border:1px solid var(--linea);box-shadow:0 6px 18px rgba(0,0,0,.35) !important;}
+[data-testid="stTooltipContent"] *{color:var(--tinta) !important;}
 .wrow.arriba .pop{top:auto;bottom:100%;margin-top:0;margin-bottom:.25rem;}
-[data-testid="stSidebar"] [data-testid="stHorizontalBlock"]:has(.wrow:hover),
-[data-testid="stSidebar"] [data-testid="stColumn"]:has(.wrow:hover),
-[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.wrow:hover),
-[data-testid="stSidebar"] [data-testid="stMarkdownContainer"]:has(.wrow:hover)
+[data-testid="stSidebarUserContent"] [data-testid="stLayoutWrapper"]:has(.wrow:hover),
+[data-testid="stSidebarUserContent"] [data-testid="stVerticalBlock"]:has(.wrow:hover),
+[data-testid="stSidebarUserContent"] [data-testid="stHorizontalBlock"]:has(.wrow:hover),
+[data-testid="stSidebarUserContent"] [data-testid="stColumn"]:has(.wrow:hover),
+[data-testid="stSidebarUserContent"] [data-testid="stElementContainer"]:has(.wrow:hover),
+[data-testid="stSidebarUserContent"] [data-testid="stMarkdownContainer"]:has(.wrow:hover)
 {position:relative;z-index:1000;overflow:visible;}
 .wrow .sfn{display:block;margin-left:1.3rem;color:var(--tenue);font-size:.72rem;}
 .pil{display:grid;grid-template-columns:1fr 3.6rem;gap:.5rem;font-size:.86rem;
 padding:.22rem 0;border-bottom:1px solid var(--linea);}
-.pil b{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--amarillo);}
+.pil b{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--acento);}
 .tabcab{display:grid;grid-template-columns:11rem 1fr 12rem 4rem;gap:.8rem;
 font-family:'IBM Plex Mono',monospace;font-size:.7rem;
 color:var(--tenue);padding-bottom:.3rem;
@@ -118,23 +142,21 @@ border-bottom:1px solid var(--violeta2);}
 .tabrow{display:grid;grid-template-columns:11rem 1fr 12rem 4rem;gap:.8rem;
 padding:.55rem 0;border-bottom:1px solid var(--linea);font-size:.87rem;
 line-height:1.45;align-items:start;}
-.tabnum{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--amarillo);}
+.tabnum{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--acento);}
 .tabpil{font-weight:800;font-size:.8rem;margin:.9rem 0 .1rem;color:var(--violeta);}
 .sfrow{display:grid;grid-template-columns:14rem 1fr 7rem;gap:.8rem;align-items:center;
 padding:.32rem 0;border-bottom:1px solid var(--linea);font-size:.85rem;}
 .sfbar{display:flex;height:19px;gap:2px;}
 .sfseg{background:var(--violeta);height:100%;border-radius:2px;}
-.sfpeso{font-family:'IBM Plex Mono',monospace;font-size:.76rem;text-align:right;color:var(--amarillo);}
+.sfpeso{font-family:'IBM Plex Mono',monospace;font-size:.76rem;text-align:right;color:var(--acento);}
 .sfn{font-size:.72rem;color:var(--tenue);}
 .pista-ayuda{font-size:.78rem;color:var(--tenue);margin:-.1rem 0 .6rem;}
-sup a.ref{color:var(--amarillo);text-decoration:none;font-size:.7em;
-padding:0 .12em;font-weight:600;}
-sup a.ref:hover{text-decoration:underline;}
-.refrow{display:grid;grid-template-columns:1.6rem 1fr;gap:.5rem;
+a.ref{color:var(--acento);text-decoration:none;font-weight:600;}
+.refrow{display:grid;grid-template-columns:2.2rem 1fr;gap:.5rem;
 padding:.28rem 0;border-bottom:1px solid var(--linea);font-size:.84rem;}
-.refnum{font-family:'IBM Plex Mono',monospace;color:var(--amarillo);}
-.refrow a{color:var(--tinta);}
-a.mas{color:var(--amarillo);font-weight:600;text-decoration:none;}
+.refnum{font-family:'IBM Plex Mono',monospace;color:var(--acento);}
+.refrow a{color:var(--tinta);text-decoration:none;}
+a.mas{color:var(--acento);font-weight:600;text-decoration:none;}
 a.mas:hover{text-decoration:underline;}
 details.mastxt{display:block;}
 details.mastxt summary{display:block;list-style:none;pointer-events:none;}
@@ -142,20 +164,21 @@ details.mastxt summary::-webkit-details-marker{display:none;}
 details.mastxt summary::marker{content:"";}
 details.mastxt .resto{display:none;}
 details.mastxt[open] .resto{display:inline;}
-details.mastxt .mas,details.mastxt .menos{color:var(--amarillo);font-weight:600;
+details.mastxt .mas,details.mastxt .menos{color:var(--acento);font-weight:600;
 cursor:pointer;pointer-events:auto;}
 details.mastxt .mas:hover,details.mastxt .menos:hover{text-decoration:underline;}
 details.mastxt .menos{display:none;}
 details.mastxt[open] .mas{display:none;}
 details.mastxt[open] .menos{display:inline;}
 details.mastxt a{pointer-events:auto;}
-@keyframes destello{0%,100%{box-shadow:0 0 0 0 rgba(217,184,104,0);}
-50%{box-shadow:0 0 0 4px rgba(217,184,104,.35);}}
+.formula{font-size:1.12em;color:inherit;}
+@keyframes destello{0%,100%{box-shadow:0 0 0 0 rgba(211,197,255,0);}
+50%{box-shadow:0 0 0 4px rgba(211,197,255,.35);}}
 .destello .stButton button{animation:destello 2.6s ease-in-out 0s 15;
-border-color:var(--amarillo) !important;}
+border-color:var(--acento) !important;}
 [data-testid="stSidebar"]{background:var(--panel);border-right:1px solid var(--linea);}
 .txtmas [data-testid="stExpander"]{border:none !important;background:none !important;}
-.txtmas [data-testid="stExpander"] summary{font-size:.9rem;color:var(--amarillo);
+.txtmas [data-testid="stExpander"] summary{font-size:.9rem;color:var(--acento);
 font-weight:600;padding:0;}
 .txtmas [data-testid="stExpander"] summary:hover{text-decoration:underline;}
 .txtmas [data-testid="stExpander"] svg{display:none;}
@@ -163,6 +186,9 @@ font-weight:600;padding:0;}
 [data-testid="stExpander"]{border-color:var(--linea);}
 [data-testid="stExpander"] summary{font-size:.82rem;color:var(--tenue);}
 .stButton button{border-color:var(--violeta2);}
+[data-testid="stMultiSelectTagsContainer"] [data-tag],[data-testid="stMultiSelectTagsContainer"] [data-tag] *{color:var(--sobre-acento) !important;}
+[data-testid="stMultiSelectTagsContainer"] [data-tag] svg{fill:var(--sobre-acento) !important;}
+button[kind="primary"],button[data-testid="stBaseButton-primary"],button[kind="primary"] *,button[data-testid="stBaseButton-primary"] *{color:var(--sobre-acento) !important;}
 </style>"""
 
 try:
@@ -180,6 +206,7 @@ FAMILIAS = {
     "eficiencia_regulatoria": ["#7A6B1F", "#9C8A33", "#BCA858"],
     "mercados_abiertos":     ["#8C3A22", "#AC5638", "#C67A5C"],
     "propiedad_estatal":     ["#5B3A7E", "#7A56A0", "#9B7BBD"],
+    "restricciones_externas": ["#7C3B5E", "#A0577E", "#C27FA0"],
 }
 
 
@@ -194,6 +221,18 @@ def paleta(f) -> dict[str, str]:
     return out
 
 
+def fmt_num(x, dec: int, L: str, signo: bool = False) -> str:
+    """Número para mostrar: coma decimal en castellano, punto en inglés."""
+    s = f"{x:+.{dec}f}" if signo else f"{x:.{dec}f}"
+    return s.replace(".", ",") if L == "es" else s
+
+
+def fmt_pct(x, dec: int, L: str) -> str:
+    """Porcentaje desde una fracción. En castellano, con espacio antes de %."""
+    s = fmt_num(x * 100, dec, L)
+    return f"{s}\u00a0%" if L == "es" else f"{s}%"
+
+
 def reglas_hover(claves: list[str]) -> str:
     """CSS que aísla un componente al pasar el mouse.
 
@@ -202,7 +241,7 @@ def reglas_hover(claves: list[str]) -> str:
     hasta el ancho que tendría si ese componente pesara 100.
 
     Se usa :has() sobre `body`, que es ancestro común de la barra lateral y del
-    ranking, así una sola regla por componente alcanza a los 176 países.
+    ranking, así una sola regla por componente alcanza a todos los países.
 
     El disparador está SÓLO en la barra lateral. Sobre la barra del ranking no
     hay animación: el segmento muestra el nombre del componente y su aporte en
@@ -210,38 +249,13 @@ def reglas_hover(claves: list[str]) -> str:
     """
     css = []
     for c in claves:
-        for disp in (f'.wrow[data-c="{c}"]:hover',):
-            css.append(f'body:has({disp}) .seg{{width:0 !important;}}')
-            css.append(f'body:has({disp}) .seg[data-c="{c}"]'
-                       f'{{width:var(--solo) !important;}}')
+        disp = f'.wrow[data-c="{c}"]:hover'
+        css.append(f'body:has({disp}) .seg{{width:0 !important;}}')
+        css.append(f'body:has({disp}) .seg[data-c="{c}"]'
+                   f'{{width:var(--solo) !important;}}')
     return "<style>" + "".join(css) + "</style>"
 
 
-def contraste(f, pesos_comp):
-    """Componente con el indicador más pesado y con el más liviano.
-
-    Es el dato central de la página: peso igual entre componentes no es peso
-    igual entre indicadores, porque cada componente se calcula con una cantidad
-    distinta de ellos.
-    """
-    d = []
-    for k, v in f["componentes"].items():
-        sf = v.get("subfactores")
-        w = pesos_comp.get(k, 0)
-        if not sf or w <= 0:
-            continue
-        n = sf["n"]
-        ws = sf.get("pesos") or [1 / n] * n
-        d.append((k, n, [x * w * 100 for x in ws]))
-    if len(d) < 2:
-        return None
-    mx = max(d, key=lambda x: max(x[2]))
-    mn = min(d, key=lambda x: min(x[2]))
-    if mx[0] == mn[0]:
-        return None
-    return {"cmax": mx[0], "nmax": mx[1], "pmax": max(mx[2]),
-            "cmin": mn[0], "nmin": mn[1], "pmin": min(mn[2]),
-            "veces": max(mx[2]) / min(mn[2])}
 REPO = "github.com/mrodriguezcartabia/indice-liberalismo-economico"
 ENLACES = {
     "fuente_metodologia":
@@ -262,7 +276,7 @@ def texto_plegable(prefijo: str, resto: str, L: str,
 
     Usa <details>/<summary> con display inline: el navegador abre y cierra solo,
     sin pedirle nada al servidor. La versión anterior guardaba el estado en la
-    barra de direcciones y cada clic disparaba un recálculo completo de los 176
+    barra de direcciones y cada clic disparaba un recálculo completo de todos los
     países para mostrar dos oraciones.
 
     Devuelve HTML para que quien lo llame lo inserte donde corresponda.
@@ -292,24 +306,21 @@ def refs(texto: str) -> str:
     y el número enlaza a la lista del pie. Es lo que permite contrastar la
     página sin tener que preguntarle a nadie de dónde salió cada dato.
     """
-    for i in range(len(REFERENCIAS), 0, -1):
-        texto = texto.replace(
-            f"[{i}]",
-            f'<sup><a class="ref" href="#ref{i}" target="_self">{i}</a></sup>')
-    return texto
+    def llamada(m):
+        i = int(m.group(1))
+        if not 1 <= i <= len(REFERENCIAS):
+            return m.group(0)
+        return f' <a class="ref" href="#ref{i}" target="_self">[{i}]</a>'
+    # Siempre con un espacio antes: "económica [3]", también entre dos citas.
+    return re.sub(r"\s*\[(\d+)\]", llamada, texto)
 
 
 def lista_referencias(L) -> None:
     st.markdown(f"**{t('ver_fuentes', L)}**")
     st.markdown("".join(
-        f'<div class="refrow" id="ref{i}"><span class="refnum">{i}</span>'
+        f'<div class="refrow" id="ref{i}"><span class="refnum">[{i}]</span>'
         f'<a href="{u}" target="_blank">{t(k, L)}</a></div>'
         for i, (k, u) in enumerate(REFERENCIAS, 1)), unsafe_allow_html=True)
-
-
-def bloque_fuentes(L) -> None:
-    """Toda afirmación de la página tiene que poder rastrearse hasta acá."""
-    lista_referencias(L)
 
 
 @st.cache_data(show_spinner=False)
@@ -344,8 +355,21 @@ def cargar_puntos(nuevos: dict):
     ss.ver += 1
 
 
+def fijar_peso(c: str, orig: dict):
+    """Toma el peso que se acaba de escribir, antes de que se recalcule todo.
+
+    Se lleva al múltiplo de 5 más cercano: el código compartible guarda los
+    puntos de a 5, y un 7 se habría guardado como 5 y reproducido otro ranking.
+    """
+    escrito = int(ss[f"pt_{c}_{ss.ver}"] or 0)
+    v = 5 * round(escrito / 5)
+    ss.puntos = {**(ss.puntos or orig), c: v}
+    if v != escrito:
+        ss.ver += 1          # campos nuevos, que arrancan del valor redondeado
+
+
 # ===========================================================================
-def arbol_subfactores(f, L, compacto=False):
+def arbol_subfactores(f, L):
     """Bloques del mismo ancho, cortados en tantos pedazos como subfactores
     declara cada componente.
 
@@ -353,9 +377,8 @@ def arbol_subfactores(f, L, compacto=False):
     indicadores. No son manipulables: Heritage publica su existencia y su
     cantidad, no sus valores por país.
     """
-    if not compacto:
-        st.markdown(f'<div class="nota">{t("arbol_intro", L)}</div>',
-                    unsafe_allow_html=True)
+    st.markdown(f'<div class="nota">{t("arbol_intro", L)}</div>',
+                unsafe_allow_html=True)
     if not any(ci.get("subfactores") for ci in f["componentes"].values()):
         st.warning(t("vintage_viejo", L))
         return
@@ -370,8 +393,8 @@ def arbol_subfactores(f, L, compacto=False):
         cada = [base * w for w in pesos]
         cadas += cada
         segs = "".join(f'<div class="sfseg" style="flex:{w}"></div>' for w in pesos)
-        etiqueta = (f"{cada[0]:.2f}%" if len({round(c, 4) for c in cada}) == 1
-                    else f"{max(cada):.2f}% / {min(cada):.2f}%")
+        etiqueta = (fmt_pct(cada[0] / 100, 2, L) if len({round(c, 4) for c in cada}) == 1
+                    else f"{fmt_pct(max(cada) / 100, 2, L)} / {fmt_pct(min(cada) / 100, 2, L)}")
         marca = "" if sf.get("verificado") else " *"
         unidad = t("indicador", L) if n == 1 else t("indicadores", L)
         filas.append(
@@ -380,7 +403,7 @@ def arbol_subfactores(f, L, compacto=False):
             f'<div class="sfbar">{segs}</div>'
             f'<div class="sfpeso">{etiqueta}</div></div>')
     st.markdown("".join(filas), unsafe_allow_html=True)
-    if cadas and not compacto:
+    if cadas:
         st.markdown(
             f'<div class="nota">'
             f'{t("arbol_conclusion", L).format(v=f"{max(cadas) / min(cadas):.0f}")}'
@@ -392,21 +415,31 @@ def cerrar_tutorial():
     ss.tutorial = False
 
 
+def cerrar_tutorial_ya():
+    """Cierra la ventana y relanza toda la app.
+
+    Un clic dentro de una ventana vuelve a dibujar solo la ventana: para que se
+    cierre y el ranking de atrás se actualice hace falta st.rerun(), que desde
+    un callback relanza la app entera.
+    """
+    ss.tutorial = False
+    st.rerun()
+
+
 # Cerrar con la X también marca el tutorial como cerrado: si no, se volvía a
 # abrir en la ejecución siguiente y chocaba con otra ventana.
 @st.dialog(" ", width="large", on_dismiss=cerrar_tutorial)
 def tutorial(f, L):
     """Un componente por vez, en ventana flotante.
 
-    Los botones usan `on_click` en vez de st.rerun(): dentro de un diálogo,
-    st.rerun() lo cierra, mientras que un callback vuelve a dibujar sólo el
-    diálogo y el paso avanza sin perder la pantalla de atrás.
+    Los botones de paso usan `on_click`: un callback vuelve a dibujar solo la
+    ventana y el paso avanza sin tocar la pantalla de atrás. Cancelar y aplicar
+    cierran la ventana con `cerrar_tutorial_ya`.
     """
     comps = list(f["componentes"])
     paso = min(ss.tut_paso, len(comps))
 
-    st.markdown(f'<div class="cintillo">{t("tut_titulo", L)}</div>',
-                unsafe_allow_html=True)
+    st.caption(t("tut_titulo", L))
 
     if paso < len(comps):
         c = comps[paso]
@@ -416,10 +449,6 @@ def tutorial(f, L):
         st.markdown(f"### {txt(ci['titulo'], L)}")
         st.caption(txt(f["pilares"][ci["pilar"]]["titulo"], L))
         st.write(txt(ci.get("definicion"), L))
-
-        sf = ci.get("subfactores")
-        if sf and sf["n"] > 1:
-            st.info(t("tut_ojo", L).format(n=sf["n"]))
 
         st.markdown(f"**{t('tut_pregunta', L)}**")
         valor = st.slider(f"{t('tut_nada', L)} → {t('tut_mucho', L)}", 0, 10,
@@ -431,7 +460,7 @@ def tutorial(f, L):
                   width="stretch",
                   on_click=lambda: ss.__setitem__("tut_paso", paso - 1))
         b2.button(t("tut_cancelar", L), width="stretch",
-                  on_click=lambda: ss.__setitem__("tutorial", False))
+                  on_click=cerrar_tutorial_ya)
         b3.button(t("tut_siguiente", L), type="primary",
                   width="stretch",
                   on_click=lambda: ss.__setitem__("tut_paso", paso + 1))
@@ -445,7 +474,7 @@ def tutorial(f, L):
     total = sum(notas.values()) or 1
     st.markdown("".join(
         f'<div class="pil"><span>{txt(v["titulo"], L)}</span><b>'
-        f'{sum(notas[c] for c, i in f["componentes"].items() if i["pilar"] == k) / total:.1%}'
+        f'{fmt_pct(sum(notas[c] for c, i in f["componentes"].items() if i["pilar"] == k) / total, 1, L)}'
         f'</b></div>' for k, v in f["pilares"].items()), unsafe_allow_html=True)
 
     b1, b2 = st.columns(2)
@@ -453,9 +482,9 @@ def tutorial(f, L):
               on_click=lambda: ss.__setitem__("tut_paso", paso - 1))
 
     def aplicar():
-        ss.tutorial = False
         ss.puntos = {c: notas[c] * 5 for c in comps}
         ss.ver += 1
+        cerrar_tutorial_ya()
 
     b2.button(t("tut_aplicar", L), type="primary", width="stretch",
               on_click=aplicar)
@@ -468,18 +497,22 @@ def critica(f, L):
     st.markdown(f"## {t('critica', L)}")
     st.markdown(f'<div class="nota">{t("crit_intro", L)}</div>',
                 unsafe_allow_html=True)
-    p = st.tabs([t("crit_p0", L), t("crit_p1", L), t("crit_p2", L),
-                 t("crit_p3", L), t("crit_p4", L)])
+    # Orden: lo que declaran y lo que calculan (con lo que no se puede
+    # verificar), los casos que no cierran y, al final, por qué otro índice.
+    # La pestaña "El peso real de cada indicador" (crit_p4, arbol_subfactores)
+    # está comentada a pedido: queda acá por si se vuelve a usar.
+    p = st.tabs([t("crit_p1", L), t("crit_p2", L), t("crit_p0", L)])
+    # , t("crit_p4", L)])
     with p[0]:
-        st.markdown(refs(t("crit_porque", L)), unsafe_allow_html=True)
-    with p[1]:
         st.markdown(refs(t("crit_definicion", L)), unsafe_allow_html=True)
-    with p[2]:
-        st.markdown(refs(t("crit_casos", L)), unsafe_allow_html=True)
-    with p[3]:
+        st.markdown(f"#### {t('crit_p3', L)}")
         st.markdown(refs(t("crit_opacidad", L)), unsafe_allow_html=True)
-    with p[4]:
-        arbol_subfactores(f, L)
+    with p[1]:
+        st.markdown(refs(t("crit_casos", L)), unsafe_allow_html=True)
+    with p[2]:
+        st.markdown(refs(t("crit_porque", L)), unsafe_allow_html=True)
+    # with p[3]:
+    #     arbol_subfactores(f, L)
     st.divider()
     lista_referencias(L)
 
@@ -511,7 +544,7 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
                     f'<div class="sfn">{orig_txt}</div></div>'
                     f'<div>{txt(ci.get("definicion"), L)}</div>'
                     f'<div>{txt(ci.get("significa_100"), L)}</div>'
-                    f'<div class="tabnum">{pesos["comp"].get(c, 0):.1%}</div>'
+                    f'<div class="tabnum">{fmt_pct(pesos["comp"].get(c, 0), 1, L)}</div>'
                     f'</div>')
         st.markdown("".join(filas), unsafe_allow_html=True)
 
@@ -522,35 +555,48 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
         disp = sorted(ind[ind.anio == anio].iso3.unique())
         elegido = st.selectbox(t("calc_elegir", L), disp,
                                index=disp.index(foco) if foco in disp else 0,
-                               format_func=nombre, key="calc_pais")
+                               format_func=lambda c: nombre(c, L), key="calc_pais")
         fs = sc[(sc.iso3 == elegido) & (sc.anio == anio)]
         if len(fs):
             fs = fs.iloc[0]
+            # Mismo cálculo que el ranking: el peso de un componente sin dato
+            # se reparte entre los que el país sí tiene.
+            activos_p = [c for c in f["componentes"] if pesos["comp"].get(c, 0) > 0]
+            con_dato = [c for c in activos_p if c in fs and pd.notna(fs[c])]
+            sin_dato = [c for c in activos_p if c not in con_dato]
+            obs = sum(pesos["comp"][c] for c in con_dato) or 1
             filas, total = [], 0.0
             for c, ci in f["componentes"].items():
-                w = pesos["comp"].get(c, 0)
-                if w <= 0 or c not in fs or pd.isna(fs[c]):
+                if c not in con_dato:
                     continue
+                w = pesos["comp"][c] / obs
                 aporte = fs[c] * w
                 total += aporte
                 filas.append({
                     t("col_comp", L): txt(ci["titulo"], L),
-                    t("calc_puntaje", L): round(float(fs[c]), 1),
-                    t("calc_peso", L): f"{w:.4%}",
-                    t("calc_aporte", L): round(float(aporte), 4),
+                    t("calc_puntaje", L): fmt_num(float(fs[c]), 1, L),
+                    t("calc_peso", L): fmt_pct(w, 4, L),
+                    t("calc_aporte", L): fmt_num(float(aporte), 4, L),
                 })
-            st.dataframe(pd.DataFrame(filas), width="stretch",
-                         hide_index=True)
+            st.table(pd.DataFrame(filas).style.hide(axis="index"))
             pub = datos["panel"]
             pub = pub[(pub.iso3 == elegido) & (pub.anio == anio)]
             oficial = (float(pub["hf_overall"].iloc[0])
                        if len(pub) and "hf_overall" in pub
                        and pd.notna(pub["hf_overall"].iloc[0]) else None)
+            if sin_dato:
+                st.caption(t("calc_falta", L).format(lista=", ".join(
+                    txt(f["componentes"][c]["titulo"], L) for c in sin_dato)))
+            # El puntaje publicado por Heritage solo es comparable cuando la
+            # ponderación activa es la de Heritage.
+            w_her = cod.pesos_desde_puntos(f["presets"]["heritage"]["puntos"])
+            es_heritage = all(abs(pesos["comp"].get(c, 0) - w_her.get(c, 0)) < 1e-9
+                              for c in f["componentes"])
             c1, c2, c3 = st.columns(3)
-            c2.metric(t("calc_recalculado", L), f"{total:.4f}")
-            if oficial is not None:
-                c1.metric(t("calc_publicado", L), f"{oficial:.1f}")
-                c3.metric(t("calc_diferencia", L), f"{total - oficial:+.4f}")
+            c2.metric(t("calc_recalculado", L), fmt_num(total, 4, L))
+            if oficial is not None and es_heritage:
+                c1.metric(t("calc_publicado", L), fmt_num(oficial, 1, L))
+                c3.metric(t("calc_diferencia", L), fmt_num(total - oficial, 4, L, signo=True))
         st.download_button(t("esc_descargar", L),
                            datos["ind"].to_csv(index=False).encode("utf-8"),
                            file_name=f"indice_{anio}.csv", mime="text/csv",
@@ -563,16 +609,20 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
         st.caption(t("peso_resultante_ayuda", L))
         st.markdown("".join(
             f'<div class="pil"><span>{txt(v["titulo"], L)}</span>'
-            f'<b>{pesos["pilar"][k]:.1%}</b></div>'
+            f'<b>{fmt_pct(pesos["pilar"][k], 1, L)}</b></div>'
             for k, v in f["pilares"].items()), unsafe_allow_html=True)
 
     # --- de dónde salen los números ---
     with p[3]:
         st.markdown(refs(t("ayuda_2", L)), unsafe_allow_html=True)
         for k, r in (f.get("rezagos") or {}).items():
+            viejos = r.get("descartados") or []
             st.info(t("esc_rezago", L).format(
                 comp=txt(f["componentes"][k]["titulo"], L),
-                a1=r["anio_dato"], a2=r["anio_asignado"], n=r["paises"]))
+                a1=r["anio_dato"], a2=r["anio_asignado"], n=r["paises"],
+                desde=r.get("desde", ""))
+                + (" " + t("esc_rezago_viejos", L).format(
+                    lista=", ".join(nombre(c, L) for c in viejos)) if viejos else ""))
         for cn, ci in f["componentes"].items():
             with st.expander(txt(ci["titulo"], L)):
                 st.write(txt(ci.get("definicion"), L))
@@ -580,13 +630,13 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
                 if fu2.get("columna"):
                     st.caption(f"{t('esc_columna', L)}: `{fu2['columna']}`")
                 if fu2.get("insumos"):
-                    st.caption(f"{t('esc_insumos', L)}: {fu2['insumos']}")
+                    st.caption(f"{t('esc_insumos', L)}: {txt(fu2['insumos'], L)}")
                 if ci.get("formula"):
-                    st.caption(f"{t('esc_formula', L)}: {ci['formula']}")
+                    st.caption(f"{t('esc_formula', L)}: {txt(ci['formula'], L)}")
                 if ci.get("reproducible"):
                     st.caption(t(f"repro_{ci['reproducible']}", L))
                 if fu2.get("url"):
-                    st.markdown(f"[{fu2.get('dataset', '')}]({fu2['url']})")
+                    st.markdown(f"[{txt(fu2.get('dataset', ''), L)}]({fu2['url']})")
                 if fu2.get("advertencia"):
                     st.warning(txt(fu2["advertencia"], L))
         st.divider()
@@ -599,9 +649,9 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
         if val.get("disponible"):
             marca = "ok" if val["cierra"] else "no"
             st.markdown(f'**{t("esc_validacion", L)}** '
-                        f'<span class="etq {marca}">máx '
-                        f'{val["diferencia_maxima"]}</span> · '
-                        f'{val["paises_comparados"]} obs.',
+                        f'<span class="etq {marca}">{t("val_max", L)} '
+                        f'{fmt_num(val["diferencia_maxima"], 4, L)}</span> · '
+                        f'{val["paises_comparados"]} {t("val_paises", L)}',
                         unsafe_allow_html=True)
 
     # --- qué falta ---
@@ -611,7 +661,7 @@ def ayuda(datos, puntos, pesos, anio, foco, L):
         nc = m.get("no_calificados", {})
         if nc:
             st.markdown(f"**{t('esc_no_calificados', L)}**")
-            st.write(", ".join(nombre(c) for c in nc.get("paises", [])))
+            st.write(", ".join(nombre(c, L) for c in nc.get("paises", [])))
             st.caption(txt(nc.get("nota"), L))
 
 
@@ -628,6 +678,10 @@ def main():
     presets = f.get("presets", {})
     POR_DEFECTO = "liberalismo"
     orig = presets[POR_DEFECTO]["puntos"]
+    # El porcentaje mínimo de datos es parte de la definición de cada índice:
+    # con otro valor, el ranking ya no es el del índice publicado.
+    COB_OFICIAL = int(round(m["cobertura_minima"] * 100))
+    ss.setdefault("sel_cob", COB_OFICIAL)
 
     def preset_activo(pts) -> str | None:
         """Qué preset corresponde a estos puntos, si alguno."""
@@ -641,7 +695,6 @@ def main():
     # main() sigue teniendo con qué seguir en lugar de romper con NameError.
     puntos = dict(orig)
     total = sum(puntos.values())
-    modificado = False
 
     # ---------------- barra lateral: texto + componentes + código ----------
     with st.sidebar:
@@ -668,10 +721,11 @@ def main():
             w = base[c] / _tot * 100
             return n, min(x * w for x in ws), max(x * w for x in ws)
 
-        # Formulario: Streamlit no recalcula la página en cada tecla, sólo al
-        # apretar Aplicar. Con trece campos sueltos, cada pulsación disparaba
-        # un recálculo completo de los 176 países y la barra se trababa.
-        with st.form("pesos", border=False):
+        # Sin formulario ni botón: Streamlit no recalcula con cada tecla, solo
+        # al apretar Enter o salir del campo, y ahí `fijar_peso` actualiza la
+        # ponderación antes del recálculo. Los botones +/- de todos los campos
+        # numéricos están ocultos (CSS): cada clic disparaba un recálculo.
+        with st.container():
             puntos = {}
             for pil, pinfo in f["pilares"].items():
                 dentro = [c for c, i in f["componentes"].items()
@@ -687,14 +741,23 @@ def main():
                     if n:
                         unidad = t("indicador" if n == 1 else "indicadores", L)
                         pi = peso_ind(c)
-                        pct = (f' · <b>{pi[1]:.2f}%</b> {t("cada_uno", L)}'
-                               if pi else "")
+                        # Con pesos internos desiguales (salud fiscal: 80/20)
+                        # no hay un "cada uno": se muestran los dos extremos.
+                        if not pi:
+                            pct = ""
+                        elif abs(pi[2] - pi[1]) < 1e-9:
+                            pct = f' · <b>{fmt_pct(pi[1] / 100, 2, L)}</b> {t("cada_uno", L)}'
+                        else:
+                            pct = f' · <b>{fmt_pct(pi[2] / 100, 2, L)} / {fmt_pct(pi[1] / 100, 2, L)}</b>'
                         detalle = f'<span class="sfn">{n} {unidad}{pct}</span>'
-                    # Definición en una ventana que sólo aparece al pasar el
+                    # Definición en una ventana que solo aparece al pasar el
                     # mouse. Vive dentro de la barra lateral, así que no puede
                     # tapar el ranking.
                     defin = html.escape(txt(ci.get("definicion"), L).strip())
-                    pop = f'<span class="pop">{defin}</span>' if defin else ""
+                    s100 = txt(ci.get("significa_100"), L)
+                    sentido = (f'<span class="pop100">{t("pop_100", L).format(x=html.escape(s100))}</span>'
+                               if s100 else "")
+                    pop = f'<span class="pop">{defin}{sentido}</span>' if defin else ""
                     col1, col2 = st.columns([1, 0.42])
                     col1.markdown(
                         f'<div class="wrow" data-c="{c}">'
@@ -704,22 +767,21 @@ def main():
                     puntos[c] = col2.number_input(
                         txt(ci["titulo"], L), 0, 100,
                         int(base.get(c, orig.get(c, 0))), 5,
-                        key=f"pt_{c}_{ss.ver}", label_visibility="collapsed")
-            aplicado = st.form_submit_button(t("aplicar_pesos", L),
-                                             type="primary",
-                                             width="stretch")
-        if aplicado:
-            ss.puntos = dict(puntos)
-            st.rerun()
+                        key=f"pt_{c}_{ss.ver}", label_visibility="collapsed",
+                        on_change=fijar_peso, args=(c, orig))
 
         puntos = dict(base)
         total = sum(puntos.values())
-        modificado = any(puntos[k] != orig.get(k, 0) for k in claves)
 
 
+    # Con todos los puntos en cero no hay índice que calcular: se avisa y se
+    # muestra el índice por defecto, sin cortar la página (los botones de la
+    # derecha tienen que seguir estando).
     if total <= 0:
-        st.warning(t("sin_datos", L))
-        return
+        st.warning(t("todo_cero", L).format(
+            indice=txt(presets[POR_DEFECTO]["nombre"], L)))
+        puntos = dict(orig)
+        total = sum(puntos.values())
     pesos_comp = cod.pesos_desde_puntos(puntos)
     pesos_pilar = {}
     for pil in f["pilares"]:
@@ -728,7 +790,7 @@ def main():
     pesos = {"comp": pesos_comp, "pilar": pesos_pilar}
 
     codigo = cod.codificar(m["sigla"], puntos, claves_codigo)
-    act = preset_activo(puntos)
+    act = preset_activo(puntos) if ss.sel_cob == COB_OFICIAL else None
 
     # ---------------- encabezado ----------------
     izq, der = st.columns([4, 1.35])
@@ -737,11 +799,11 @@ def main():
                   else t("titulo_propio", L))
         st.markdown(f"# {titulo}")
         cabeza, cola = t("intro_pagina", L).split("|", 1)
-        # "|" separa lo visible de lo que se abre con "…más"; es también el
-        # corte de párrafo. La descripción de cada índice no va acá: está en
+        # "|" separa lo visible de lo que se abre con "…más", dentro del
+        # mismo párrafo. La descripción de cada índice no va acá: está en
         # la ayuda del selector de índice.
         st.markdown(texto_plegable(
-            cabeza.strip(), "<br><br>" + cola.strip(), L,
+            cabeza.strip(), " " + cola.strip(), L,
             extra=f'<br><br>{t("ver_razones", L).format(b=t("critica", L))}'),
             unsafe_allow_html=True)
     # ---------------- controles en horizontal ----------------
@@ -749,10 +811,12 @@ def main():
     anios_ok = [int(a) for a in sorted(ind_all[ind_all.publicable].anio.unique())]
     g = izq.columns([1.6, 0.9, 0.9, 1.1])
 
-    # La lista de opciones es siempre la misma y el selector no lleva clave:
-    # así su valor se reinicia en cada pasada a partir de `actual`, que sale de
-    # los puntos vigentes. Con clave propia, el widget conservaría una elección
-    # vieja y volvería a dispararse en bucle.
+    # El selector muestra siempre `actual`, que sale de los puntos vigentes.
+    # Streamlit recuerda la última elección de un widget, así que la clave
+    # cambia con `actual` y cada vez que se abre el tutorial desde acá: con
+    # clave nueva, el selector arranca de `actual` y una elección vieja no
+    # vuelve a dispararse.
+    ss.setdefault("ver_sel", 0)
     opciones = list(presets) + ["propio"]
     etiq = {k: txt(v["nombre"], L) for k, v in presets.items()}
     etiq["propio"] = t("titulo_propio", L)
@@ -760,36 +824,45 @@ def main():
     sel = g[0].selectbox(t("elegir_indice", L), opciones,
                          index=opciones.index(actual),
                          format_func=lambda k: etiq[k],
-                         help=txt(presets.get(actual, {}).get("descripcion"), L))
+                         help=txt(presets.get(actual, {}).get("descripcion"), L),
+                         key=f"sel_indice_{actual}_{ss.ver_sel}")
     if sel in presets and sel != actual:
         cargar_puntos(presets[sel]["puntos"])
+        ss.sel_cob = COB_OFICIAL          # el índice elegido, con su porcentaje
         st.rerun()
+    elif sel == "propio" and actual != "propio":
+        # Elegido a mano: se abre "Armá tu propio índice". Si se cancela, el
+        # selector vuelve solo al índice que estaba, porque `actual` no cambió.
+        ss.tutorial = True
+        ss.tut_paso = 0
+        ss.tut_notas = {}
+        ss.ver_sel += 1
 
-    # Sembrar session_state y NO pasar `value`: dar a la vez un valor posicional
-    # y una clave hace que Streamlit reinicie el widget al relanzarse el script
-    # tras aplicar pesos, y el control perdía lo que el usuario había elegido.
+    # Los controles de vista guardan su valor en session_state (sel_*): cada
+    # control tiene esa clave, así conserva lo elegido entre recálculos.
     ss.setdefault("sel_anio", anios_ok[-1])
-    ss.setdefault("sel_cuantos", 25)
-    ss.setdefault("sel_cob", int(round(m["cobertura_minima"] * 100)))
+    ss.setdefault("sel_cuantos", 15)
     if ss.sel_anio not in anios_ok:
         ss.sel_anio = anios_ok[-1]
-    anio = g[1].selectbox(t("anio", L), anios_ok,
-                          index=anios_ok.index(ss.sel_anio))
-    ss.sel_anio = anio
+    # Con clave fija y sin valor inicial: si el valor inicial cambia entre un
+    # recálculo y el siguiente, Streamlit crea un control nuevo y la elección
+    # se pierde (un cambio de año sí y otro no).
+    anio = g[1].selectbox(t("anio", L), anios_ok, key="sel_anio")
     cuantos = g[2].number_input(t("mostrar", L), min_value=5, max_value=200,
-                                value=int(ss.sel_cuantos), step=5)
-    ss.sel_cuantos = int(cuantos)
+                                step=5, key="sel_cuantos")
+    # Con clave propia: el valor nuevo ya está en ss.sel_cob al empezar el
+    # recálculo, así el selector de índice pasa a "Índice propio" en el mismo
+    # paso en que se cambia el porcentaje.
     min_cob = g[3].number_input(t("cobertura_min", L), min_value=0,
-                                max_value=100, value=int(ss.sel_cob), step=5,
+                                max_value=100, step=5, key="sel_cob",
                                 help=t("cobertura_ayuda", L))
-    ss.sel_cob = int(min_cob)
     min_cob = min_cob / 100
     ind_a = ind_all[ind_all.anio == anio].set_index("iso3")
     ss.setdefault("sel_seg", [c for c in ("ARG",) if c in ind_a.index])
     seguidos = izq.multiselect(
         t("seguir", L), sorted(ind_a.index),
         default=[c for c in ss.sel_seg if c in ind_a.index],
-        format_func=nombre, help=t("seguir_ayuda", L))
+        format_func=lambda c: nombre(c, L), help=t("seguir_ayuda", L))
     ss.sel_seg = list(seguidos)
 
     # Streamlit admite una sola ventana por ejecución: si se pidió otra, el
@@ -813,10 +886,11 @@ def main():
                 and c in sc_a.columns]
     vivo["cobertura"] = (sc_a[con_peso].notna().mean(axis=1) if con_peso
                          else ind_a["cobertura"])
-    if "cumplimiento" in ind_a.columns:
-        vivo["cumplimiento"] = ind_a["cumplimiento"]
-    vivo["publicable"] = vivo["cobertura"] >= min_cob
-    vivo["ranking"] = vivo.where(vivo.publicable)["indice"].rank(
+    # Sin puntaje no hay puesto, aunque la cobertura mínima sea 0. El
+    # redondeo a 9 decimales evita que el ruido de punto flotante desempate
+    # dos países que suman exactamente lo mismo.
+    vivo["publicable"] = (vivo["cobertura"] >= min_cob) & vivo["indice"].notna()
+    vivo["ranking"] = vivo.where(vivo.publicable)["indice"].round(9).rank(
         ascending=False, method="min")
     # Rankings de referencia: los dos presets, calculados con los mismos datos,
     # para que se pueda comparar contra cualquiera de los dos sin cambiar de vista.
@@ -825,13 +899,13 @@ def main():
         w_ref = cod.pesos_desde_puntos(pre["puntos"])
         act_ref = {c: v for c, v in w_ref.items() if v > 0 and c in sc_a.columns}
         if act_ref:
-            # Mismo criterio que el ranking principal: sólo compiten los países
-            # con cobertura suficiente en los componentes de ESE índice. Sin
+            # Mismo criterio que el ranking principal: solo compiten los países
+            # con cobertura suficiente en los componentes de ese índice. Sin
             # esto, un país sin datos suficientes ocupaba un puesto en la
             # referencia y corría a todos los de abajo.
             cob_ref = sc_a[list(act_ref)].notna().mean(axis=1)
             referencias[nom] = (nz.puntaje_pilar(sc_a, act_ref)
-                                .where(cob_ref >= min_cob)
+                                .where(cob_ref >= min_cob).round(9)
                                 .rank(ascending=False, method="min"))
     for nom, r_ in referencias.items():
         vivo[f"ref_{nom}"] = r_
@@ -856,8 +930,7 @@ def main():
         grupos.append(nuevo)
 
     def num(x):
-        x = f"{x:.2f}"
-        return x.replace(".", ",") if L == "es" else x
+        return fmt_num(x, 2, L)
 
     def y_e(siguiente):
         """«y» pasa a «e» antes de i- o hi- (salvo hie-, hia-...: «y hielo»)."""
@@ -884,6 +957,51 @@ def main():
                 rmin=num(min(g["r"])), rmax=num(max(g["r"])), veces=veces)
         izq.markdown(f'<div class="aviso">{aviso}</div>', unsafe_allow_html=True)
 
+    # Países a la vista a los que les falta algún componente activo: llevan
+    # asterisco y acá se aclara cuál falta.
+    tope = min(int(cuantos), max(int(vivo.publicable.sum()), 1))
+    vista = list(vivo[vivo.publicable].nlargest(tope, "indice").index) + [
+        c for c in seguidos if c in vivo.index and vivo.loc[c, "publicable"]]
+    activos_c = [c for c in claves if pesos_comp.get(c, 0) > 0 and c in sc_a.columns]
+    incompletos = {}
+    for iso3 in dict.fromkeys(vista):
+        falta = [c for c in activos_c if pd.isna(sc_a[c].get(iso3))]
+        if falta:
+            incompletos[iso3] = falta
+    if incompletos:
+        lista = "; ".join(
+            f'{nombre(i, L)} ({", ".join(txt(f["componentes"][c]["titulo"], L).lower() for c in fl)})'
+            for i, fl in incompletos.items())
+        izq.markdown(f'<div class="aviso">{t("aviso_incompleto", L).format(lista=html.escape(lista))}</div>',
+                     unsafe_allow_html=True)
+
+    # Con Heritage activo, los países cuyo puesto difiere del que se deduce del
+    # puntaje publicado por Heritage llevan doble asterisco: es la misma
+    # réplica, pero desempata con los decimales que Heritage no publica.
+    distintos = {}
+    if act == "heritage":
+        pub = datos["panel"]
+        pub = pub[(pub.anio == anio) & pub["hf_overall"].notna()].set_index("iso3")
+        # El puesto publicado por Heritage cuando la edición lo trae (2020 a
+        # 2023). Si no, el que surge de su puntaje: dos países empatados ocupan
+        # un rango de puestos (Heritage los desempata con decimales que no
+        # publica), y solo se marca un puesto que cae fuera de ese rango.
+        if "hf_puesto" in pub and pub["hf_puesto"].notna().any():
+            desde_ = hasta_ = pub["hf_puesto"].dropna()
+        else:
+            desde_ = pub["hf_overall"].rank(ascending=False, method="min")
+            hasta_ = pub["hf_overall"].rank(ascending=False, method="max")
+        for iso3 in dict.fromkeys(vista):
+            if iso3 in desde_.index:
+                d_, h_ = int(desde_[iso3]), int(hasta_[iso3])
+                if not d_ <= int(vivo.loc[iso3, "ranking"]) <= h_:
+                    distintos[iso3] = str(d_) if d_ == h_ else f"{d_}–{h_}"
+    if distintos:
+        lista = "; ".join(f"{nombre(i, L)} ({t('puesto_heritage', L)} {n})"
+                          for i, n in distintos.items())
+        izq.markdown(f'<div class="aviso">{t("aviso_puesto_heritage", L).format(lista=html.escape(lista))}</div>',
+                     unsafe_allow_html=True)
+
     # ---------------- pestañas ----------------
     color = paleta(f)
     activos = [c for c in claves if pesos_comp.get(c, 0) > 0]
@@ -893,6 +1011,9 @@ def main():
 
     # ---------------- columna de acciones ----------------
     with der:
+        # Marca para el CSS: esta columna mide lo que su botón más largo en una
+        # línea, y la izquierda ocupa el resto.
+        st.markdown('<span class="marca-der"></span>', unsafe_allow_html=True)
         i1, i2 = st.columns(2)
         for col, cod_l in ((i1, "es"), (i2, "en")):
             if col.button(cod_l.upper(), width="stretch",
@@ -929,24 +1050,31 @@ def main():
             st.error(t("codigo_invalido", L))
         try:
             from pdf import generar
-            filas_pdf = [(int(r["ranking"]), nombre(i), r["indice"],
+            filas_pdf = [(int(r["ranking"]), nombre(i, L), r["indice"],
                           r.get("ref_heritage")
                           if pd.notna(r.get("ref_heritage")) else None)
                          for i, r in tabla.iterrows()]
             blob = generar(
-                titulo, t("intro_pagina", L).replace("|", "\n\n"), filas_pdf,
+                titulo, t("intro_pagina", L).replace("|", " "), filas_pdf,
                 {"codigo": codigo, "repo": REPO,
                  "fuente": m["fuente"]["publicador"],
-                 "corte": m.get("fecha_corte", ""), "anio": anio,
-                 "procedencia": f"{m['fuente']['dataset']}. "
-                                f"{m['fuente'].get('url_datos', '')}"},
+                 # La fecha de corte publicada es la de la edición vigente;
+                 # para otro año se cita esa edición y no se inventa la fecha.
+                 "corte": m.get("fecha_corte", "") if anio == int(m["vintage"]) else "",
+                 "anio": anio,
+                 "procedencia": (
+                     f"{txt(m['fuente']['dataset'], L)}. {m['fuente'].get('url_datos', '')}"
+                     if anio == int(m["vintage"]) else
+                     f"{txt(m['fuente']['dataset_anio'], L).format(a=anio)}. "
+                     f"{(m['fuente'].get('urls_ediciones_viejas') or {}).get(anio) or m['fuente']['url_datos_anio'].format(a=anio)}")},
                 {"codigo": t("codigo_config", L), "corte": t("m_corte", L),
                  "anio": t("anio", L), "ponderacion": t("pdf_ponderacion", L),
                  "puesto": t("col_puesto", L), "pais": t("col_pais", L),
                  "puntaje": t("col_puntaje", L), "comparacion": "Heritage",
-                 "procedencia": t("pdf_procedencia", L)},
+                 "procedencia": t("pdf_procedencia", L),
+                 "sep_decimal": "," if L == "es" else "."},
                 [(txt(f["componentes"][c]["titulo"], L),
-                  f"{pesos_comp[c]:.1%}") for c in activos])
+                  fmt_pct(pesos_comp[c], 1, L)) for c in activos])
             st.download_button(t("imprimir", L), blob,
                                file_name=f"indice_{anio}_{codigo}.pdf",
                                mime="application/pdf",
@@ -956,24 +1084,27 @@ def main():
 
 
     with izq:
-        tabs = st.tabs([t("v_ranking", L), t("v_dispersion", L)])
-
-    with tabs[0]:
 
         def fila(iso3, r, marcar=False):
             # Cada tramo mide puntaje_del_componente x peso_del_componente, así
             # que la suma de los tramos es el índice y el largo total es
-            # comparable entre países.
+            # comparable entre países. Si al país le falta un componente, ese
+            # tramo no está y la barra queda más corta que el puntaje: el
+            # puntaje reparte el peso entre lo observado, y el asterisco del
+            # nombre lo avisa.
+            # También van los componentes con peso cero, con ancho cero: al
+            # pasar el mouse por uno en la barra lateral, su tramo se estira.
+            vals = {c: sc_a[c].get(iso3) for c in claves if c in sc_a.columns}
+            vals = {c: v for c, v in vals.items() if v is not None and pd.notna(v)}
             segs = ""
-            for c in claves:
-                v = sc_a[c].get(iso3) if c in sc_a.columns else None
-                if v is None or pd.isna(v):
-                    continue
+            for c, v in vals.items():
+                w = pesos_comp[c]
                 segs += (f'<div class="seg" data-c="{c}" '
-                         f'style="width:{v * pesos_comp[c]:.3f}%;'
-                         f'--solo:{v:.2f}%;background:{color[c]}" '
-                         f'title="{txt(f["componentes"][c]["titulo"], L)}: '
-                         f'{v:.1f} × {pesos_comp[c]:.1%}"></div>')
+                         f'style="width:{v * w:.3f}%;'
+                         f'--solo:{v:.2f}%;background:{color[c]}">'
+                         f'<span class="segpop">'
+                         f'{html.escape(txt(f["componentes"][c]["titulo"], L))}: '
+                         f'{fmt_num(v, 1, L)} × {fmt_pct(w, 1, L)}</span></div>')
             celdas = ""
             for nom in orden_ref:
                 v_ = r.get(f"ref_{nom}")
@@ -987,9 +1118,10 @@ def main():
                 celdas += f'<div class="vs">{int(v_)}{marca}</div>'
             return (f'<div class="fila{" seguido" if marcar else ""}">'
                     f'<div class="pos">{int(r["ranking"])}</div>'
-                    f'<div class="pais">{nombre(iso3)}</div>'
+                    f'<div class="pais">{html.escape(nombre(iso3, L))}'
+                    f'{"*" if iso3 in incompletos else ""}{"**" if iso3 in distintos else ""}</div>'
                     f'<div class="barra">{segs}</div>'
-                    f'<div class="val">{r["indice"]:.1f}</div>'
+                    f'<div class="val">{fmt_num(r["indice"], 1, L)}</div>'
                     f'{celdas}</div>')
 
         bloque = [
@@ -1018,35 +1150,7 @@ def main():
                and not vivo.loc[c, "publicable"]]
         if sin:
             st.caption(f"{t('sin_cobertura', L)}: "
-                       + ", ".join(nombre(c) for c in sin))
-
-    with tabs[1]:
-        if "cumplimiento" in vivo.columns and vivo["cumplimiento"].notna().any():
-            eje = f.get("eje_cumplimiento") or {}
-            st.markdown(f'<div class="nota">{t("disp_ayuda", L)}<br><b>'
-                        f'{txt(eje.get("titulo"), L)}</b>: '
-                        f'{txt(eje.get("definicion"), L)}</div>',
-                        unsafe_allow_html=True)
-            base_d = vivo[vivo.publicable].reset_index()
-            base_d["pais"] = base_d["iso3"].map(nombre)
-            base_d["seguido"] = base_d["iso3"].isin(seguidos)
-            try:
-                import altair as alt
-                st.altair_chart(
-                    alt.Chart(base_d).mark_circle(opacity=.8).encode(
-                        x=alt.X("indice", title=t("eje_x", L)),
-                        y=alt.Y("cumplimiento",
-                                title=txt(f["eje_cumplimiento"]["titulo"], L)),
-                        color=alt.condition(alt.datum.seguido,
-                                            alt.value("#A8412F"),
-                                            alt.value("#0F6B5C")),
-                        size=alt.condition(alt.datum.seguido,
-                                           alt.value(230), alt.value(70)),
-                        tooltip=["pais", "indice", "cumplimiento"],
-                    ).properties(height=470).interactive(),
-                    width="stretch")
-            except ImportError:
-                st.scatter_chart(base_d, x="indice", y="cumplimiento")
+                       + ", ".join(nombre(c, L) for c in sin))
 
 
 main()

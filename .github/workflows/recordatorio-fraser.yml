@@ -1,6 +1,6 @@
 # Recordatorio anual para cargar la edición nueva del Economic Freedom of the
 # World (Fraser Institute). Fraser no permite descargas automáticas, así que
-# esto sólo abre un aviso (issue) con el instructivo de docs/CARGAR_FRASER.md.
+# esto solo abre un aviso (issue) con el instructivo de docs/CARGAR_FRASER.md.
 name: Recordatorio Fraser
 
 on:
@@ -16,7 +16,7 @@ jobs:
   avisar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Abrir el aviso (uno por año)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

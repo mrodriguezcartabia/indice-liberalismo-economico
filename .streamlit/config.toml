@@ -1,10 +1,10 @@
-# Modo oscuro suave, violeta y amarillo mate. Streamlit necesita el tema base
+# Modo oscuro suave: gris con un toque violeta y acento lila. Streamlit necesita el tema base
 # declarado acá; el CSS de la app afina el resto.
 # Sin `headless`: con esa opción el navegador no se abre solo al arrancar.
 [theme]
 base = "dark"
-primaryColor = "#D9B868"
-backgroundColor = "#322C48"
-secondaryBackgroundColor = "#3C3557"
+primaryColor = "#D3C5FF"
+backgroundColor = "#2E2C36"
+secondaryBackgroundColor = "#383641"
 textColor = "#F0EDF6"
 font = "sans serif"

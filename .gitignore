@@ -9,3 +9,5 @@ __pycache__/
 *.xlsx
 !data/**/*.xlsx
 .streamlit/secrets.toml
+# Capturas de pantalla para revisar la app: no van al repo
+Screenshot*.png

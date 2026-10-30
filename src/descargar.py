@@ -13,10 +13,11 @@ Fuentes:
                          incluidas contribuciones a la seguridad social, % del
                          PBI. OCDE, Global Revenue Statistics Database.
     fmi_gasto_publico    Gasto total del gobierno general, % del PBI. FMI,
-                         World Economic Outlook. Sólo años con dato observado:
+                         World Economic Outlook. Solo años con dato observado:
                          las proyecciones se descartan.
     heritage             Los doce componentes y el puntaje total del Index of
-                         Economic Freedom, edición `meta.vintage` del config.
+                         Economic Freedom, ediciones `meta.ediciones_desde` a
+                         `meta.vintage` del config.
                          Si Heritage ya publicó la edición siguiente, avisa:
                          pasar a una edición nueva cambia la fecha de corte y
                          la cita de la fuente, así que no se hace solo.
@@ -61,21 +62,29 @@ URL_FMI = ("https://api.imf.org/external/sdmx/2.1/data/"
 
 URL_HERITAGE = ("https://static.heritage.org/index/data/{a}/"
                 "{a}_indexofeconomicfreedom_data.xlsx")
-# Columna del Excel de Heritage -> serie. "Judicial Efectiveness" y "Monitary
-# Freedom" son erratas del original: hay que copiarlas tal cual.
-HERITAGE = {"Property Rights": "hf_property_rights",
-            "Judicial Efectiveness": "hf_judicial_effectiveness",
-            "Government Integrity": "hf_government_integrity",
-            "Tax Burden": "hf_tax_burden",
-            "Government Spending": "hf_government_spending",
-            "Fiscal Health": "hf_fiscal_health",
-            "Business Freedom": "hf_business_freedom",
-            "Labor Freedom": "hf_labor_freedom",
-            "Monitary Freedom": "hf_monetary_freedom",
-            "Trade Freedom": "hf_trade_freedom",
-            "Investment Freedom": "hf_investment_freedom",
-            "Financial Freedom": "hf_financial_freedom",
-            "Overall Score": "hf_overall"}
+# Ediciones anteriores a 2024: sus direcciones están en el config
+# (meta.fuente.urls_ediciones_viejas), que también las usa para citarlas.
+# Columna del Excel de Heritage -> serie. Cada edición escribe algunos nombres
+# a su manera (y con erratas: "Judicial Efectiveness", "Monitary Freedom",
+# "Judical Effectiveness"); se acepta cualquiera de las grafías conocidas.
+# "{a} Score" es el puntaje total en las ediciones viejas.
+HERITAGE = {("Property Rights",): "hf_property_rights",
+            ("Judicial Effectiveness", "Judicial Efectiveness",
+             "Judical Effectiveness"): "hf_judicial_effectiveness",
+            ("Government Integrity", "Govt Integrity"): "hf_government_integrity",
+            ("Tax Burden",): "hf_tax_burden",
+            ("Government Spending", "Gov't Spending"): "hf_government_spending",
+            ("Fiscal Health",): "hf_fiscal_health",
+            ("Business Freedom",): "hf_business_freedom",
+            ("Labor Freedom",): "hf_labor_freedom",
+            ("Monetary Freedom", "Monitary Freedom"): "hf_monetary_freedom",
+            ("Trade Freedom",): "hf_trade_freedom",
+            ("Investment Freedom",): "hf_investment_freedom",
+            ("Financial Freedom",): "hf_financial_freedom",
+            ("Overall Score", "{a} Score"): "hf_overall",
+            ("World Rank",): "hf_puesto"}
+# Columnas que no todas las ediciones traen: si faltan, esa edición no la aporta.
+HERITAGE_OPCIONALES = {"hf_puesto"}
 
 
 def _get(url: str, accept: str = "*/*") -> requests.Response:
@@ -110,16 +119,53 @@ def fmi_gasto_publico() -> None:
 
 
 def heritage() -> None:
-    anio = int(yaml.safe_load(CONFIG.read_text(encoding="utf-8"))["meta"]["vintage"])
-    with tempfile.TemporaryDirectory() as tmp:
-        xlsx = Path(tmp) / f"heritage_{anio}.xlsx"
-        xlsx.write_bytes(_get(URL_HERITAGE.format(a=anio)).content)
-        for columna, serie in HERITAGE.items():
-            convertir(xlsx, "Country", columna, serie, anio=anio,
-                      hoja=f"ef{anio}", saltar=1)
-    print(f"  · heritage: edición {anio} -> data/raw/manual/hf_*.csv")
+    """Todas las ediciones desde `ediciones_desde` hasta `meta.vintage`.
 
-    siguiente = anio + 1
+    Cada edición se guarda con su año. Las que Heritage ya no deja bajar
+    automáticamente se avisan y se cargan a mano.
+    """
+    meta = yaml.safe_load(CONFIG.read_text(encoding="utf-8"))["meta"]
+    vintage = int(meta["vintage"])
+    partes = {serie: [] for serie in HERITAGE.values()}
+    fuentes_usadas = {}
+    with tempfile.TemporaryDirectory() as tmp:
+        for anio in range(int(meta.get("ediciones_desde", vintage)), vintage + 1):
+            viejas = meta["fuente"].get("urls_ediciones_viejas") or {}
+            urls = [URL_HERITAGE.format(a=anio)] + ([viejas[anio]] if anio in viejas else [])
+            for url in urls:
+                r = requests.get(url, headers=CABECERAS, timeout=300)
+                if r.status_code == 200 and not r.headers.get("content-type", "").startswith("text/html"):
+                    break
+            else:
+                print(f"  ! heritage {anio}: no se pudo bajar de ninguna dirección")
+                continue
+            xlsx = Path(tmp) / f"heritage_{anio}{Path(url).suffix}"
+            xlsx.write_bytes(r.content)
+            hoja = pd.ExcelFile(xlsx).sheet_names[0]
+            # Las ediciones nuevas traen un rótulo arriba del encabezado; las viejas, no.
+            saltar = next(n for n in (0, 1, 2) if {"Country", "Country Name"} &
+                          set(pd.read_excel(xlsx, sheet_name=hoja, skiprows=n, nrows=0).columns))
+            cols = list(pd.read_excel(xlsx, sheet_name=hoja, skiprows=saltar, nrows=0).columns)
+            limpias = {str(c).strip(): c for c in cols}
+            col_pais = limpias.get("Country") or limpias["Country Name"]
+            for nombres, serie in HERITAGE.items():
+                col = next((limpias[n.format(a=anio)] for n in nombres
+                            if n.format(a=anio) in limpias), None)
+                if col is None and serie in HERITAGE_OPCIONALES:
+                    continue
+                if col is None:
+                    raise ValueError(f"heritage {anio}: falta la columna {nombres[0]}")
+                csv = Path(tmp) / f"{serie}_{anio}.csv"
+                convertir(xlsx, col_pais, col, serie, anio=anio, hoja=hoja,
+                          saltar=saltar, salida=csv)
+                partes[serie].append(pd.read_csv(csv))
+            fuentes_usadas[anio] = url
+            print(f"  · heritage: edición {anio} <- {url}")
+    for serie, dfs in partes.items():
+        if dfs:
+            guardar(serie, pd.concat(dfs)[["iso3", "anio", "valor"]])
+
+    siguiente = vintage + 1
     r = requests.head(URL_HERITAGE.format(a=siguiente), headers=CABECERAS,
                       timeout=60, allow_redirects=True)
     if r.status_code == 200:

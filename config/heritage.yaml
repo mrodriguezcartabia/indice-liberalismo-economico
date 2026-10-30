@@ -15,15 +15,16 @@ meta:
   sigla: "HF"
   carpeta: "heritage"
   nombre:
-    es: "Índice de Libertad Económica (réplica)"
+    es: "Índice de libertad económica (réplica)"
     en: "Index of Economic Freedom (replica)"
   descripcion:
     es: >
-      Réplica exacta del índice publicado por The Heritage Foundation desde 1995.
-      Doce componentes promediados con peso igual. Es la vara más citada en
-      prensa, y el punto de partida de esta página.
+      Réplica casi exacta del índice publicado por The Heritage Foundation desde
+      1995: difiere como mucho 0,067 puntos, por el redondeo de los datos publicados.
+      Doce componentes promediados con peso igual. Es la vara más citada en prensa y el punto de partida de esta página.
     en: >
-      Exact replica of the index published by The Heritage Foundation since 1995.
+      Near-exact replica of the index published by The Heritage Foundation since
+      1995: it differs by at most 0.067 points, due to rounding in the published data.
       Twelve components averaged with equal weight. It is the most widely cited
       benchmark in the press, and the starting point of this page.
   escala:
@@ -31,13 +32,31 @@ meta:
     en: "0 to 100. Higher = more economic freedom under their definition."
   fecha_corte: "2025-06-30"
   vintage: 2026
-  cobertura_minima: 0.90
+  # Primera edición de Heritage que se carga: con ella el visitante puede ver
+  # la evolución año por año.
+  ediciones_desde: 2020
+  cobertura_minima: 1.0
+  # Un dato de más de estos años respecto del vintage no se usa: el país queda
+  # sin dato en ese componente.
+  antiguedad_maxima: 10
 
   fuente:
     publicador: "The Heritage Foundation"
-    dataset: "Index of Economic Freedom 2026 (32ª edición)"
+    dataset: {es: "Index of Economic Freedom 2026 (32ª edición)",
+              en: "Index of Economic Freedom 2026 (32nd edition)"}
     url_datos: "https://static.heritage.org/index/data/2026/2026_indexofeconomicfreedom_data.xlsx"
     url_metodologia: "https://static.heritage.org/index/pdf/2026/2026_indexofeconomicfreedom_methodology.pdf"
+    # Cita de cada edición cargada (ediciones_desde a vintage): {a} es el año.
+    dataset_anio: {es: "Index of Economic Freedom {a}",
+                   en: "Index of Economic Freedom {a}"}
+    url_datos_anio: "https://static.heritage.org/index/data/{a}/{a}_indexofeconomicfreedom_data.xlsx"
+    # 2020 a 2023: ya no están en static.heritage.org; siguen en el sitio
+    # anterior de Heritage, publicado aparte. 2020 y 2021 solo en .xls.
+    urls_ediciones_viejas:
+      2020: "https://indexdotnet.azurewebsites.net/index/excel/2020/index2020_data.xls"
+      2021: "https://indexdotnet.azurewebsites.net/index/excel/2021/index2021_data.xls"
+      2022: "https://indexdotnet.azurewebsites.net/index/excel/2022/index2022_data.xlsx"
+      2023: "https://indexdotnet.azurewebsites.net/index/excel/2023/index2023_data.xlsx"
     url_pagina: "https://economicfreedom.heritage.org/pages/all-country-scores"
     archivo: "2026_indexofeconomicfreedom_data.xlsx"
     hoja: "ef2026"
@@ -47,7 +66,7 @@ meta:
       es: >
         El archivo trae país, región, puntaje total y los 12 componentes. No
         incluye insumos crudos: las ediciones anteriores a 2022 traían tasas
-        impositivas, gasto y aranceles, ésta no. Dos nombres de columna tienen
+        impositivas, gasto y aranceles, esta no. Dos nombres de columna tienen
         erratas del original ("Judicial Efectiveness", "Monitary Freedom") y se
         copian literalmente.
       en: >
@@ -94,8 +113,8 @@ pilares:
     externo: true
     descripcion:
       es: >
-        Restricciones legales que Heritage sólo considera de manera
-        cualitativa, dentro de Libertad de inversión y Libertad financiera.
+        Restricciones legales que Heritage solo considera de manera
+        cualitativa, dentro de libertad de inversión y libertad financiera.
         Este pilar arranca en cero.
       en: >
         Legal restrictions that Heritage only considers qualitatively, within
@@ -107,11 +126,11 @@ pilares:
       es: >
         Heritage no incluye ningún componente que mida qué posee el Estado
         dentro de la economía. Este pilar arranca en cero: subirlo agrega una
-        dimensión que el índice original no tiene.
+        dimensión que el índice de Heritage no tiene.
       en: >
         Heritage includes no component measuring what the state owns within the
         economy. This pillar starts at zero: raising it adds a dimension the
-        original index does not have.
+        Heritage index does not have.
 
 # ---------------------------------------------------------------------------
 # `reproducible` clasifica cada componente segun se pueda o no recalcular desde
@@ -178,7 +197,7 @@ componentes:
     puntos: 10
     titulo: {es: "Integridad del gobierno", en: "Government Integrity"}
     definicion:
-      es: "Percepción de corrupción y soborno. Basado en encuestas de expertos."
+      es: "Percepción de corrupción y soborno. Se basa en encuestas de expertos."
       en: "Perception of corruption and bribery. Based on expert surveys."
     fuente:
       columna: "Government Integrity"
@@ -199,16 +218,18 @@ componentes:
     definicion:
       es: >
         Promedio de tres subfactores: alícuota máxima del impuesto a las
-        ganancias personales, alícuota máxima corporativa, y recaudación total
+        ganancias personales, alícuota máxima corporativa y recaudación total
         sobre PBI. No incluye aportes obligatorios a la seguridad social.
       en: >
         Average of three sub-factors: top marginal personal income tax rate, top
         corporate rate, and total tax revenue over GDP. Mandatory social security
         contributions are not included.
-    formula: "100 − 0,03 · x²  (promedio de los tres subfactores)"
+    formula: {es: "100 − 0,03 · x²  (promedio de los tres subfactores)",
+              en: "100 − 0.03 · x²  (average of the three sub-factors)"}
     fuente:
       columna: "Tax Burden"
-      insumos: "KPMG · Deloitte · PwC Worldwide Tax Summaries · World Bank WDI · OCDE · Eurostat · FMI"
+      insumos: {es: "KPMG · Deloitte · PwC Worldwide Tax Summaries · World Bank WDI · OCDE · Eurostat · FMI",
+                en: "KPMG · Deloitte · PwC Worldwide Tax Summaries · World Bank WDI · OECD · Eurostat · IMF"}
     reproducible: total
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -229,10 +250,12 @@ componentes:
       en: >
         Total government spending over GDP, three-year average. It measures
         budget flow, not assets: state-owned assets do not enter.
-    formula: "100 − 0,03 · G²  (G = gasto/PBI, promedio 3 años)"
+    formula: {es: "100 − 0,03 · G²  (G = gasto/PBI, promedio 3 años)",
+              en: "100 − 0.03 · G²  (G = spending/GDP, 3-year average)"}
     fuente:
       columna: "Government Spending"
-      insumos: "FMI World Economic Outlook · OCDE · Eurostat · BAfD · BAD · CEPAL"
+      insumos: {es: "FMI World Economic Outlook · OCDE · Eurostat · BAfD · BAD · CEPAL",
+                en: "IMF World Economic Outlook · OECD · Eurostat · AfDB · ADB · ECLAC"}
     reproducible: total
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -259,10 +282,12 @@ componentes:
     definicion:
       es: "Déficit y deuda pública. Es un resultado fiscal, no una libertad."
       en: "Deficit and public debt. It is a fiscal outcome, not a freedom."
-    formula: "0,8 · (100 − 2·D²) + 0,2 · (100 − 0,01·B²)"
+    formula: {es: "0,8 · (100 − 2·D²) + 0,2 · (100 − 0,01·B²)",
+              en: "0.8 · (100 − 2·D²) + 0.2 · (100 − 0.01·B²)"}
     fuente:
       columna: "Fiscal Health"
-      insumos: "FMI World Economic Outlook"
+      insumos: {es: "FMI World Economic Outlook",
+                en: "IMF World Economic Outlook"}
     reproducible: total
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -287,7 +312,8 @@ componentes:
         Access to electricity is an infrastructure indicator.
     fuente:
       columna: "Business Freedom"
-      insumos: "World Bank WGI y WDI · Credendo · World Bank Women, Business and the Law"
+      insumos: {es: "World Bank WGI y WDI · Credendo · World Bank Women, Business and the Law",
+                en: "World Bank WGI and WDI · Credendo · World Bank Women, Business and the Law"}
     reproducible: fuentes
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -310,7 +336,8 @@ componentes:
         participation rate, which are outcomes rather than rules.
     fuente:
       columna: "Labor Freedom"
-      insumos: "World Bank WGI y WDI · Freedom House · OIT · World Bank Employing Workers"
+      insumos: {es: "World Bank WGI y WDI · Freedom House · OIT · World Bank Employing Workers",
+                en: "World Bank WGI and WDI · Freedom House · ILO · World Bank Employing Workers"}
     reproducible: fuentes
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -331,10 +358,12 @@ componentes:
       en: >
         Three-year weighted inflation, minus a price-control penalty of up to 20
         points which Heritage does not publish by country.
-    formula: "100 − 6,333·√(inflación ponderada) − penalización  ·  pesos 0,665 / 0,245 / 0,090"
+    formula: {es: "100 − 6,333·√(inflación ponderada) − penalización  ·  pesos 0,665 / 0,245 / 0,090",
+              en: "100 − 6.333·√(weighted inflation) − penalty  ·  weights 0.665 / 0.245 / 0.090"}
     fuente:
       columna: "Monitary Freedom"
-      insumos: "FMI International Financial Statistics · FMI World Economic Outlook"
+      insumos: {es: "FMI International Financial Statistics · FMI World Economic Outlook",
+                en: "IMF International Financial Statistics · IMF World Economic Outlook"}
       nota_columna: {es: "errata en el original", en: "typo in the original"}
     reproducible: parcial
     direccion: mas_es_mas_libre
@@ -358,10 +387,12 @@ componentes:
         Weighted average tariff, minus a non-tariff barrier penalty which
         Heritage does not publish by country. Among those barriers it considers
         the number of measures notified to the WTO.
-    formula: "100 · (50 − arancel) / 50 − penalización"
+    formula: {es: "100 · (50 − arancel) / 50 − penalización",
+              en: "100 · (50 − tariff) / 50 − penalty"}
     fuente:
       columna: "Trade Freedom"
-      insumos: "OMC World Tariff Profiles · World Bank WDI · USTR National Trade Estimate"
+      insumos: {es: "OMC World Tariff Profiles · World Bank WDI · USTR National Trade Estimate",
+                en: "WTO World Tariff Profiles · World Bank WDI · USTR National Trade Estimate"}
     reproducible: parcial
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -388,7 +419,8 @@ componentes:
         deducts no points.
     fuente:
       columna: "Investment Freedom"
-      insumos: "US State Dept Investment Climate Statements · USTR · OCDE · FMI Artículo IV"
+      insumos: {es: "US State Dept Investment Climate Statements · USTR · OCDE · FMI Artículo IV",
+                en: "US State Dept Investment Climate Statements · USTR · OECD · IMF Article IV"}
     reproducible: ninguna
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -414,7 +446,8 @@ componentes:
         the index where state ownership is considered, and qualitatively.
     fuente:
       columna: "Financial Freedom"
-      insumos: "FMI Artículo IV · OCDE Economic Surveys · bancos centrales"
+      insumos: {es: "FMI Artículo IV · OCDE Economic Surveys · bancos centrales",
+                en: "IMF Article IV · OECD Economic Surveys · central banks"}
     reproducible: ninguna
     direccion: mas_es_mas_libre
     normalizacion: {tipo: escala_fija, min: 0, max: 100}
@@ -429,7 +462,7 @@ componentes:
       es: >
         Extensión de la propiedad del Estado sobre la economía. No forma parte
         del índice de Heritage: ninguno de sus doce componentes mide esta
-        dimensión. La única consideración aparece dentro de Libertad financiera,
+        dimensión. La única consideración aparece dentro de libertad financiera,
         de manera cualitativa.
       en: >
         Extent of state ownership over the economy. It is not part of the
@@ -484,7 +517,7 @@ componentes:
     titulo: {es: "Controles de capital", en: "Capital controls"}
     definicion:
       es: >
-        Restricciones legales al movimiento de capitales, según la cantidad de categorías con controles en el informe AREAER del FMI. Heritage lo considera dentro de Libertad de inversión, con descuentos cualitativos de 5, 10 o 15 puntos.
+        Restricciones legales al movimiento de capitales, según la cantidad de categorías con controles en el informe AREAER del FMI. Heritage lo considera dentro de libertad de inversión, con descuentos cualitativos de 5, 10 o 15 puntos.
       en: >
         Legal restrictions on capital movement, based on the number of categories with controls in the IMF AREAER report. Heritage considers it within Investment Freedom, with qualitative deductions of 5, 10 or 15 points.
     fuente:
@@ -512,7 +545,7 @@ componentes:
     titulo: {es: "Regulación del crédito", en: "Credit market regulation"}
     definicion:
       es: >
-        Propiedad estatal de los bancos, crédito absorbido por el sector público y controles de tasas de interés. Heritage lo trata dentro de Libertad financiera, con puntajes asignados en escalones de diez.
+        Propiedad estatal de los bancos, crédito absorbido por el sector público y controles de tasas de interés. Heritage lo trata dentro de libertad financiera, con puntajes asignados en escalones de diez.
       en: >
         State ownership of banks, credit absorbed by the public sector and interest rate controls. Heritage treats it within Financial Freedom, with scores assigned in steps of ten.
     fuente:
@@ -542,11 +575,11 @@ componentes:
       es: >
         Consumo del gobierno como proporción del consumo total. Es distinto
         del gasto público de Heritage, que incluye inversión y transferencias:
-        la correlación medida entre ambos es 0,649.
+        la correlación medida entre ambos es 0,66.
       en: >
         Government consumption as a share of total consumption. It differs
         from Heritage's government spending, which includes investment and
-        transfers: their measured correlation is 0.649.
+        transfers: their measured correlation is 0.66.
     fuente:
       columna: "1A Government consumption"
       publicador: "Fraser Institute"
@@ -574,7 +607,8 @@ componentes:
         Total general government tax revenue over GDP, including social security
         contributions. Unlike Heritage's tax burden, it does not mix top rates
         with revenue.
-    formula: "100 − 0,03 · x²  (x = recaudación/PBI, misma forma que Heritage)"
+    formula: {es: "100 − 0,03 · x²  (x = recaudación/PBI, misma forma que Heritage)",
+              en: "100 − 0.03 · x²  (x = revenue/GDP, same form as Heritage)"}
     fuente:
       serie: "Total tax revenue, general government (S13), % of GDP"
       publicador: "OCDE"
@@ -602,7 +636,8 @@ componentes:
         Total general government expenditure over GDP, latest observed year.
         It is the same data Heritage averages over three years for its
         government spending component.
-    formula: "100 − 0,03 · x²  (x = gasto/PBI, misma forma que Heritage)"
+    formula: {es: "100 − 0,03 · x²  (x = gasto/PBI, misma forma que Heritage)",
+              en: "100 − 0.03 · x²  (x = spending/GDP, same form as Heritage)"}
     fuente:
       serie: "GGX_NGDP — General government total expenditure, % of GDP"
       publicador: "Fondo Monetario Internacional"
@@ -661,7 +696,7 @@ orden_codigo: [fmi_gasto_publico, ocde_presion_fiscal,
                z_entrada_mercados]
 
 # ---------------------------------------------------------------------------
-# Eje vertical del grafico de dispersion. NO entra al puntaje.
+# Estado de derecho, calculado aparte. NO entra al puntaje.
 # Se construye con los propios componentes de Estado de derecho de Heritage.
 # ---------------------------------------------------------------------------
 eje_cumplimiento:
@@ -690,8 +725,7 @@ presets:
     descripcion:
       es: >
         La ponderación oficial: los doce componentes con diez puntos cada uno.
-        Como cada categoría agrupa tres componentes, las cuatro terminan
-        pesando 25%. Ese 25% no es una decisión declarada: es consecuencia de
+        Como cada categoría agrupa tres componentes, las cuatro terminan pesando 25 %. Ese 25 % no es una decisión declarada: es consecuencia de
         cuántos componentes tiene cada una.
       en: >
         The official weighting: the twelve components with ten points each.
@@ -734,8 +768,7 @@ presets:
         Fraser.
         No incluye los componentes de Estado de derecho (derechos de
         propiedad, efectividad judicial, integridad del gobierno): miden la
-        calidad de las instituciones, no el tamaño del Estado. Esa dimensión
-        se muestra aparte, en el eje vertical del gráfico de dispersión.
+        calidad de las instituciones, no el tamaño del Estado.
         Tampoco incluye salud fiscal ni libertad monetaria, que miden déficit,
         deuda e inflación.
       en: >
@@ -747,8 +780,7 @@ presets:
         controls, credit market regulation and freedom to enter markets.
         It does not include the rule-of-law components (property rights,
         judicial effectiveness, government integrity): they measure the
-        quality of institutions, not the size of the state. That dimension is
-        shown separately, on the vertical axis of the scatter chart.
+        quality of institutions, not the size of the state.
         Nor does it include fiscal health or monetary freedom, which measure
         deficit, debt and inflation.
     puntos: {hf_property_rights: 0,
@@ -776,3 +808,7 @@ solo_reportadas:
   hf_overall:
     titulo: {es: "Puntaje total publicado", en: "Published overall score"}
     columna: "Overall Score"
+  hf_puesto:
+    titulo: {es: "Puesto publicado", en: "Published rank"}
+    columna: "World Rank"
+    nota: "Solo en las ediciones 2020 a 2023; las siguientes no traen el puesto."

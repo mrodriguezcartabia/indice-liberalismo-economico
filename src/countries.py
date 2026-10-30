@@ -124,7 +124,10 @@ EN = {
     "niger": "NER", "nigeria": "NGA", "north macedonia": "MKD",
     "norway": "NOR", "oman": "OMN", "pakistan": "PAK", "palau": "PLW",
     "panama": "PAN", "papua new guinea": "PNG", "paraguay": "PRY",
-    "peru": "PER", "philippines": "PHL", "poland": "POL", "portugal": "PRT",
+    "peru": "PER", "philippines": "PHL", "the philippines": "PHL",
+    "congo, democratic republic of the congo": "COD", "congo, republic of": "COG",
+    "hong kong sar": "HKG", "korea, south": "KOR", "lao p.d.r.": "LAO",
+    "macedonia": "MKD", "poland": "POL", "portugal": "PRT",
     "qatar": "QAT", "romania": "ROU", "russia": "RUS",
     "russian federation": "RUS", "rwanda": "RWA",
     "saint kitts and nevis": "KNA", "saint lucia": "LCA",
@@ -238,8 +241,75 @@ for _k, _v in ES.items():                     # primer nombre en espanol gana
 for _k, _v in EN.items():                     # completa lo que falte
     _NOMBRES.setdefault(_v, _titulo(_k))
 _NOMBRES.update(_ACENTOS)                     # y los bien escritos mandan
+_NOMBRES.update({"ABW": "Aruba", "COK": "Islas Cook", "NIU": "Niue",
+                 "PRI": "Puerto Rico", "TKL": "Tokelau", "BEN": "Benín",
+                 "OMN": "Omán"})
+
+# Nombres en inglés para mostrar (la interfaz y el PDF en inglés).
+_NOMBRES_EN = {
+    "ABW": "Aruba", "AFG": "Afghanistan", "AGO": "Angola", "ALB": "Albania",
+    "AND": "Andorra", "ARE": "United Arab Emirates", "ARG": "Argentina",
+    "ARM": "Armenia", "ATG": "Antigua and Barbuda", "AUS": "Australia",
+    "AUT": "Austria", "AZE": "Azerbaijan", "BDI": "Burundi", "BEL": "Belgium",
+    "BEN": "Benin", "BFA": "Burkina Faso", "BGD": "Bangladesh",
+    "BGR": "Bulgaria", "BHR": "Bahrain", "BHS": "Bahamas",
+    "BIH": "Bosnia and Herzegovina", "BLR": "Belarus", "BLZ": "Belize",
+    "BOL": "Bolivia", "BRA": "Brazil", "BRB": "Barbados", "BRN": "Brunei",
+    "BTN": "Bhutan", "BWA": "Botswana", "CAF": "Central African Republic",
+    "CAN": "Canada", "CHE": "Switzerland", "CHL": "Chile", "CHN": "China",
+    "CIV": "Côte d'Ivoire", "CMR": "Cameroon", "COD": "DR Congo",
+    "COG": "Republic of the Congo", "COK": "Cook Islands", "COL": "Colombia",
+    "COM": "Comoros", "CPV": "Cabo Verde", "CRI": "Costa Rica", "CUB": "Cuba",
+    "CYP": "Cyprus", "CZE": "Czechia", "DEU": "Germany", "DJI": "Djibouti",
+    "DMA": "Dominica", "DNK": "Denmark", "DOM": "Dominican Republic",
+    "DZA": "Algeria", "ECU": "Ecuador", "EGY": "Egypt", "ERI": "Eritrea",
+    "ESP": "Spain", "EST": "Estonia", "ETH": "Ethiopia", "FIN": "Finland",
+    "FJI": "Fiji", "FRA": "France", "FSM": "Micronesia", "GAB": "Gabon",
+    "GBR": "United Kingdom", "GEO": "Georgia", "GHA": "Ghana", "GIN": "Guinea",
+    "GMB": "Gambia", "GNB": "Guinea-Bissau", "GNQ": "Equatorial Guinea",
+    "GRC": "Greece", "GRD": "Grenada", "GTM": "Guatemala", "GUY": "Guyana",
+    "HKG": "Hong Kong", "HND": "Honduras", "HRV": "Croatia", "HTI": "Haiti",
+    "HUN": "Hungary", "IDN": "Indonesia", "IND": "India", "IRL": "Ireland",
+    "IRN": "Iran", "IRQ": "Iraq", "ISL": "Iceland", "ISR": "Israel",
+    "ITA": "Italy", "JAM": "Jamaica", "JOR": "Jordan", "JPN": "Japan",
+    "KAZ": "Kazakhstan", "KEN": "Kenya", "KGZ": "Kyrgyzstan", "KHM": "Cambodia",
+    "KIR": "Kiribati", "KNA": "Saint Kitts and Nevis", "KOR": "South Korea",
+    "KWT": "Kuwait", "LAO": "Laos", "LBN": "Lebanon", "LBR": "Liberia",
+    "LBY": "Libya", "LCA": "Saint Lucia", "LIE": "Liechtenstein",
+    "LKA": "Sri Lanka", "LSO": "Lesotho", "LTU": "Lithuania",
+    "LUX": "Luxembourg", "LVA": "Latvia", "MAC": "Macao", "MAR": "Morocco",
+    "MDA": "Moldova", "MDG": "Madagascar", "MDV": "Maldives", "MEX": "Mexico",
+    "MHL": "Marshall Islands", "MKD": "North Macedonia", "MLI": "Mali",
+    "MLT": "Malta", "MMR": "Myanmar", "MNE": "Montenegro", "MNG": "Mongolia",
+    "MOZ": "Mozambique", "MRT": "Mauritania", "MUS": "Mauritius",
+    "MWI": "Malawi", "MYS": "Malaysia", "NAM": "Namibia", "NER": "Niger",
+    "NGA": "Nigeria", "NIC": "Nicaragua", "NIU": "Niue", "NLD": "Netherlands",
+    "NOR": "Norway", "NPL": "Nepal", "NRU": "Nauru", "NZL": "New Zealand",
+    "OMN": "Oman", "PAK": "Pakistan", "PAN": "Panama", "PER": "Peru",
+    "PHL": "Philippines", "PLW": "Palau", "PNG": "Papua New Guinea",
+    "POL": "Poland", "PRI": "Puerto Rico", "PRK": "North Korea",
+    "PRT": "Portugal", "PRY": "Paraguay", "PSE": "Palestine", "QAT": "Qatar",
+    "ROU": "Romania", "RUS": "Russia", "RWA": "Rwanda", "SAU": "Saudi Arabia",
+    "SDN": "Sudan", "SEN": "Senegal", "SGP": "Singapore",
+    "SLB": "Solomon Islands", "SLE": "Sierra Leone", "SLV": "El Salvador",
+    "SMR": "San Marino", "SOM": "Somalia", "SRB": "Serbia",
+    "SSD": "South Sudan", "STP": "São Tomé and Príncipe", "SUR": "Suriname",
+    "SVK": "Slovakia", "SVN": "Slovenia", "SWE": "Sweden", "SWZ": "Eswatini",
+    "SYC": "Seychelles", "SYR": "Syria", "TCD": "Chad", "TGO": "Togo",
+    "THA": "Thailand", "TJK": "Tajikistan", "TKL": "Tokelau",
+    "TKM": "Turkmenistan", "TLS": "Timor-Leste", "TON": "Tonga",
+    "TTO": "Trinidad and Tobago", "TUN": "Tunisia", "TUR": "Türkiye",
+    "TUV": "Tuvalu", "TWN": "Taiwan", "TZA": "Tanzania", "UGA": "Uganda",
+    "UKR": "Ukraine", "URY": "Uruguay", "USA": "United States",
+    "UZB": "Uzbekistan", "VCT": "Saint Vincent and the Grenadines",
+    "VEN": "Venezuela", "VNM": "Vietnam", "VUT": "Vanuatu", "WSM": "Samoa",
+    "XKX": "Kosovo", "YEM": "Yemen", "ZAF": "South Africa", "ZMB": "Zambia",
+    "ZWE": "Zimbabwe",
+}
 
 
-def nombre(iso3: str) -> str:
-    """Nombre para mostrar. Si no lo conoce, devuelve el propio ISO3."""
+def nombre(iso3: str, idioma: str = "es") -> str:
+    """Nombre para mostrar en el idioma pedido. Si no lo conoce, el ISO3."""
+    if idioma == "en":
+        return _NOMBRES_EN.get(iso3, _NOMBRES.get(iso3, iso3))
     return _NOMBRES.get(iso3, iso3)

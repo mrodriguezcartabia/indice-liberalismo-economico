@@ -14,7 +14,7 @@ TENUE = (107, 122, 114)
 SENAL = (15, 107, 92)
 LINEA = (213, 218, 210)
 
-# Helvetica sólo cubre latin-1: las comillas y rayas tipográficas de los textos
+# Helvetica solo cubre latin-1: las comillas y rayas tipográficas de los textos
 # se pasan a su equivalente simple y cualquier otro carácter se reemplaza por "?".
 SIMPLES = str.maketrans({"\u201c": '"', "\u201d": '"', "\u2018": "'",
                          "\u2019": "'", "\u2013": "-", "\u2014": "-",
@@ -48,7 +48,8 @@ def generar(titulo: str, subtitulo: str, filas: list[tuple],
 
     pdf.set_font("Helvetica", size=7)
     pdf.set_text_color(*TENUE)
-    pdf.cell(0, 4, f"{meta['fuente']}  ·  {etiquetas['corte']} {meta['corte']}"
+    corte = f"  ·  {etiquetas['corte']} {meta['corte']}" if meta.get("corte") else ""
+    pdf.cell(0, 4, f"{meta['fuente']}{corte}"
                    f"  ·  {etiquetas['anio']} {meta['anio']}", new_y="NEXT")
 
     pdf.set_font("Helvetica", "B", 19)
@@ -90,7 +91,8 @@ def generar(titulo: str, subtitulo: str, filas: list[tuple],
         pdf.cell(12, 5.2, str(puesto))
         pdf.set_text_color(*TINTA)
         pdf.cell(88, 5.2, pais)
-        pdf.cell(28, 5.2, f"{puntaje:.1f}", align="R")
+        pdf.cell(28, 5.2, f"{puntaje:.1f}".replace(".", etiquetas.get("sep_decimal", ".")),
+                 align="R")
         if orig is None or orig == puesto:
             pdf.set_text_color(*TENUE)
             pdf.cell(0, 5.2, "-", align="R", new_y="NEXT")

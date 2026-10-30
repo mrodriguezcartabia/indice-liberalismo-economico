@@ -87,17 +87,42 @@ vista.
 | Serie | General government total expenditure, % of GDP |
 | Página | `https://data.imf.org/en/datasets/IMF.RES:WEO` |
 | API | `https://api.imf.org/external/sdmx/2.1/data/IMF.RES,WEO/*.GGX_NGDP.A` |
-| Contenido | 197 países, 1980–2025. Se descartan las proyecciones: sólo años hasta `LATEST_ACTUAL_ANNUAL_DATA` de cada país |
+| Contenido | 197 países, 1980–2025. Se descartan las proyecciones: solo años hasta `LATEST_ACTUAL_ANNUAL_DATA` de cada país |
 | Cita sugerida por el FMI | International Monetary Fund. World Economic Outlook (WEO), https://data.imf.org/en/datasets/IMF.RES:WEO |
 | Términos | © International Monetary Fund. https://www.imf.org/external/terms.htm |
 
 El FMI usa `KOS` para Kosovo y `WBG` para Palestina; el script los pasa a los
 ISO3 del proyecto (`XKX`, `PSE`).
 
-**Heritage** también se baja sola (`python src/descargar.py heritage`): la
-edición indicada en `meta.vintage` del config, desde la dirección de descarga
-de la tabla de arriba. Si ya existe la edición del año siguiente, el script
-avisa pero no la carga, porque cambia la fecha de corte y la cita.
+**Heritage** también se baja sola (`python src/descargar.py heritage`): todas
+las ediciones desde `meta.ediciones_desde` (2020) hasta `meta.vintage` (2026),
+cada una con su año, para que la página permita ver la evolución.
+
+- 2024 a 2026: `static.heritage.org`, la dirección de descarga de la tabla de
+  arriba con el año correspondiente.
+- 2020 a 2023: ya no están en esa dirección. Siguen en el sitio anterior de
+  Heritage, publicado aparte en `indexdotnet.azurewebsites.net`; las direcciones
+  exactas están en `meta.fuente.urls_ediciones_viejas` del config, que la app
+  usa para citarlas. 2020 y 2021 solo existen en el formato viejo de Excel
+  (`.xls`), que se lee con `xlrd`. Se verificó su autenticidad contra lo
+  publicado por Heritage (por ejemplo, el top 5 de 2023: Singapur 83,9, Suiza
+  83,8, Irlanda 82,0, Taiwán 80,7 y Nueva Zelanda 78,9).
+- Cada edición escribe algunos nombres de columna a su manera ("Judical
+  Effectiveness", "Govt Integrity", "Gov't Spending", "Monitary Freedom"...):
+  el script acepta todas las grafías conocidas.
+- Las ediciones 2020 a 2023 traen además el puesto oficial (`World Rank`), que
+  se guarda como `hf_puesto`. Muestra que Heritage no deja empates: dos países
+  con el mismo puntaje publicado ocupan puestos distintos, desempatados con
+  decimales que no publica.
+
+Si ya existe la edición del año siguiente, el script avisa pero no la carga,
+porque cambia la fecha de corte y la cita.
+
+**Años anteriores al vigente.** Para cada año del índice, los componentes que
+no son de Heritage (Fraser, OCDE, FMI) usan el último dato de cada país hasta
+ese año, siempre que no tenga más de diez años (`meta.antiguedad_maxima`). Como
+Fraser y la OCDE llegan a 2024, los años 2024, 2025 y 2026 usan para ellos el
+mismo dato.
 
 **Actualización mensual:** `.github/workflows/actualizar-datos.yml` corre estas
 descargas el día 5 de cada mes y, si hay datos nuevos, abre un pull request
