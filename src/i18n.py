@@ -61,11 +61,11 @@ T = {
         "es": "Cada ponderación tiene un código único. Guardalo para volver "
               "exactamente a esta configuración, o citalo en una nota: "
               "cualquiera que lo ingrese acá reproduce el mismo ranking. No se "
-              "guarda nada en ningún servidor; el código ES la ponderación, "
+              "guarda nada en ningún servidor; el código es la ponderación, "
               "escrita en forma corta.",
         "en": "Every weighting has a unique code. Save it to return to this exact "
               "configuration, or cite it: anyone who enters it here reproduces "
-              "the same ranking. Nothing is stored on any server; the code IS the "
+              "the same ranking. Nothing is stored on any server; the code is the "
               "weighting, written in short form."},
     "aplicar_codigo": {"es": "Aplicar", "en": "Apply"},
     "codigo_invalido": {"es": "Código no reconocido", "en": "Code not recognized"},

@@ -287,8 +287,8 @@
         "en": "Property Rights"
       },
       "definicion": {
-        "es": "Mide si el marco legal permite adquirir, mantener y usar propiedad privada, y si esas leyes se hacen cumplir. Mide la SEGURIDAD de los derechos, no la DISTRIBUCIÓN de la propiedad.\n",
-        "en": "Measures whether the legal framework allows acquiring, holding and using private property, and whether those laws are enforced. It measures the SECURITY of rights, not the DISTRIBUTION of ownership.\n"
+        "es": "Mide si el marco legal permite adquirir, mantener y usar propiedad privada, y si esas leyes se hacen cumplir. Mide la seguridad de los derechos, no la distribución de la propiedad.\n",
+        "en": "Measures whether the legal framework allows acquiring, holding and using private property, and whether those laws are enforced. It measures the security of rights, not the distribution of ownership.\n"
       },
       "subfactores": {
         "n": 3,

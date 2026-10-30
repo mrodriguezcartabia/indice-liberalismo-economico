@@ -51,6 +51,11 @@ class ST(types.ModuleType):
     def __getattr__(self, nombre): return lambda *a, **k: None
 
 st = ST("streamlit"); sys.modules["streamlit"] = st
+# components.html (script de la ventana de definición): no hace nada acá.
+v1 = types.ModuleType("streamlit.components.v1"); v1.html = lambda *a, **k: None
+comp = types.ModuleType("streamlit.components"); comp.v1 = v1
+ST.components = comp
+sys.modules.update({"streamlit.components": comp, "streamlit.components.v1": v1})
 ruta = Path("app/streamlit_app.py")
 src = ruta.read_text().replace("\nmain()\n", "\n")
 ns = {"__name__": "app", "__file__": str(ruta.resolve())}
@@ -97,4 +102,7 @@ ns["ss"] = ST.session_state
 ns["main"]()
 assert any("miden casi lo mismo" in x for x in salida), "no apareció el aviso de superposición"
 print("  aviso de superposición OK")
+assert any('class="pop"' in x and "Gasto total del gobierno general" in x for x in salida), \
+    "no apareció la definición en la ventana emergente"
+print("  ventana con la definición OK")
 print("prueba de humo superada")

@@ -20,12 +20,14 @@ que produce src/build.py.
 
 from __future__ import annotations
 
+import html
 import json
 import sys
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+import streamlit.components.v1 as components
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "src"))
@@ -47,7 +49,7 @@ CSS = """<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--fondo:#322C48;--panel:#3C3557;--panel2:#453D63;--tinta:#F0EDF6;
---tenue:#B8B0CC;--amarillo:#D9B868;--violeta:#9A82C9;--violeta2:#5F4E8A;
+--tenue:#B8B0CC;--gris-pop:#575463;--amarillo:#D9B868;--violeta:#9A82C9;--violeta2:#5F4E8A;
 --alerta:#D98070;--linea:#4A4368;}
 .stApp{background:var(--fondo);}
 html,body,[class*="css"]{font-family:'Archivo',system-ui,sans-serif;
@@ -59,7 +61,7 @@ h1 em{font-style:normal;color:var(--amarillo);}
 .bajada .mas{color:var(--amarillo);font-weight:600;}
 .cab{display:grid;grid-template-columns:2.5rem 10.5rem 1fr 4rem 3.6rem 3.6rem;gap:.5rem;
 white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
-letter-spacing:.1em;text-transform:uppercase;color:var(--tenue);
+color:var(--tenue);
 padding-bottom:.35rem;border-bottom:1px solid var(--violeta2);}
 .fila{display:grid;grid-template-columns:2.5rem 10.5rem 1fr 4rem 3.6rem 3.6rem;gap:.5rem;
 align-items:center;padding:.26rem 0;border-bottom:1px solid var(--linea);}
@@ -74,8 +76,8 @@ align-items:center;padding:.26rem 0;border-bottom:1px solid var(--linea);}
 .baja{color:var(--alerta);font-weight:600;}
 .seguido{background:rgba(154,130,201,.15);margin:0 -.4rem;padding:.26rem .4rem;border-radius:3px;}
 .seguido .pais{color:var(--amarillo);}
-.corte{font-family:'IBM Plex Mono',monospace;font-size:.65rem;letter-spacing:.12em;
-text-transform:uppercase;color:var(--tenue);margin:1rem 0 .3rem;}
+.corte{font-family:'IBM Plex Mono',monospace;font-size:.7rem;
+color:var(--tenue);margin:1rem 0 .3rem;}
 .nota{font-size:.86rem;color:var(--tinta);opacity:.85;
 border-left:2px solid var(--violeta);padding-left:.75rem;margin:.6rem 0;
 line-height:1.6;}
@@ -84,22 +86,34 @@ padding-left:.75rem;margin:.6rem 0;line-height:1.5;}
 .paso{font-family:'IBM Plex Mono',monospace;font-size:.8rem;padding:.3rem 0;
 border-bottom:1px dotted var(--linea);color:var(--tinta);}
 .etq{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:.62rem;
-letter-spacing:.08em;text-transform:uppercase;padding:.1rem .45rem;border-radius:3px;
+padding:.1rem .45rem;border-radius:3px;
 border:1px solid var(--linea);color:var(--tenue);}
 .etq.ok{border-color:var(--amarillo);color:var(--amarillo);}
 .etq.no{border-color:var(--alerta);color:var(--alerta);}
 .chip{width:9px;height:9px;border-radius:2px;display:inline-block;
 margin-right:.4rem;flex:0 0 auto;}
 .wrow{font-size:.86rem;cursor:default;border-radius:3px;padding:.15rem .3rem;
-margin:0 -.3rem;transition:background .15s;}
+margin:0 -.3rem;transition:background .15s;position:relative;}
 .wrow:hover{background:rgba(217,184,104,.13);}
+.wrow .pop{display:none;position:absolute;left:0;top:100%;z-index:1000;width:100%;
+min-width:12rem;margin-top:.25rem;padding:.45rem .6rem;border-radius:4px;
+background:var(--gris-pop);border:1px solid var(--linea);color:var(--tinta);
+font-size:.76rem;line-height:1.38;box-shadow:0 6px 18px rgba(0,0,0,.35);
+pointer-events:none;}
+.wrow:hover .pop{display:block;}
+.wrow.arriba .pop{top:auto;bottom:100%;margin-top:0;margin-bottom:.25rem;}
+[data-testid="stSidebar"] [data-testid="stHorizontalBlock"]:has(.wrow:hover),
+[data-testid="stSidebar"] [data-testid="stColumn"]:has(.wrow:hover),
+[data-testid="stSidebar"] [data-testid="stElementContainer"]:has(.wrow:hover),
+[data-testid="stSidebar"] [data-testid="stMarkdownContainer"]:has(.wrow:hover)
+{position:relative;z-index:1000;overflow:visible;}
 .wrow .sfn{display:block;margin-left:1.3rem;color:var(--tenue);font-size:.72rem;}
 .pil{display:grid;grid-template-columns:1fr 3.6rem;gap:.5rem;font-size:.86rem;
 padding:.22rem 0;border-bottom:1px solid var(--linea);}
 .pil b{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--amarillo);}
 .tabcab{display:grid;grid-template-columns:11rem 1fr 12rem 4rem;gap:.8rem;
-font-family:'IBM Plex Mono',monospace;font-size:.64rem;letter-spacing:.1em;
-text-transform:uppercase;color:var(--tenue);padding-bottom:.3rem;
+font-family:'IBM Plex Mono',monospace;font-size:.7rem;
+color:var(--tenue);padding-bottom:.3rem;
 border-bottom:1px solid var(--violeta2);}
 .tabrow{display:grid;grid-template-columns:11rem 1fr 12rem 4rem;gap:.8rem;
 padding:.55rem 0;border-bottom:1px solid var(--linea);font-size:.87rem;
@@ -671,11 +685,16 @@ def main():
                         pct = (f' · <b>{pi[1]:.2f}%</b> {t("cada_uno", L)}'
                                if pi else "")
                         detalle = f'<span class="sfn">{n} {unidad}{pct}</span>'
+                    # Definición en una ventana que sólo aparece al pasar el
+                    # mouse. Vive dentro de la barra lateral, así que no puede
+                    # tapar el ranking.
+                    defin = html.escape(txt(ci.get("definicion"), L).strip())
+                    pop = f'<span class="pop">{defin}</span>' if defin else ""
                     col1, col2 = st.columns([1, 0.42])
                     col1.markdown(
                         f'<div class="wrow" data-c="{c}">'
                         f'<span><i class="chip" style="background:{color[c]}">'
-                        f'</i>{txt(ci["titulo"], L)}{detalle}</span></div>',
+                        f'</i>{txt(ci["titulo"], L)}{detalle}</span>{pop}</div>',
                         unsafe_allow_html=True)
                     puntos[c] = col2.number_input(
                         txt(ci["titulo"], L), 0, 100,
@@ -983,3 +1002,40 @@ def main():
 
 
 main()
+
+
+def ubicar_ventanas():
+    """Abre la ventana de definición hacia arriba cuando abajo no entra.
+
+    CSS no sabe dónde quedó cada componente en la pantalla, así que esto lo
+    decide un script chico: al pasar el mouse mide la ventana y, si se sale
+    por abajo y arriba hay más lugar, la da vuelta. El script se agrega al
+    documento de la página una sola vez, aunque la app se recalcule.
+    """
+    codigo = """
+    document.addEventListener("mouseover", function (e) {
+      var fila = e.target.closest && e.target.closest(".wrow");
+      if (!fila || !fila.querySelector(".pop")) return;
+      fila.classList.remove("arriba");
+      requestAnimationFrame(function () {
+        var pop = fila.querySelector(".pop").getBoundingClientRect();
+        var r = fila.getBoundingClientRect();
+        var barra = document.querySelector('[data-testid="stSidebar"]');
+        var lim = barra ? barra.getBoundingClientRect()
+                        : {top: 0, bottom: window.innerHeight};
+        var techo = Math.max(lim.top, 0);
+        var piso = Math.min(lim.bottom, window.innerHeight);
+        if (pop.bottom > piso && r.top - techo > piso - r.bottom) {
+          fila.classList.add("arriba");
+        }
+      });
+    });"""
+    components.html(
+        "<script>var d = window.parent.document;"
+        "if (!d.getElementById('ubicar-ventanas')) {"
+        "var s = d.createElement('script'); s.id = 'ubicar-ventanas';"
+        f"s.textContent = {json.dumps(codigo)}; d.head.appendChild(s);}}"
+        "</script>", height=0)
+
+
+ubicar_ventanas()
